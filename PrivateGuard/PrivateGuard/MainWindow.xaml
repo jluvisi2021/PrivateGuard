@@ -5,8 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrivateGuard"
         mc:Ignorable="d"
-        Title="PrivateGuard" Height="450" Width="800" ResizeMode="NoResize" Cursor="Arrow">
-    <Grid>
-        
+        Title="PrivateGuard" Height="300" Width="450" ResizeMode="NoResize" Cursor="Arrow" Icon="PG_Shield_t_70.png">
+    <Grid Background="#FFA09D9D">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <Label x:Name="PGTitleLabel" Content="Private Guard" HorizontalAlignment="Left" Margin="3,10,0,0" VerticalAlignment="Top" FontSize="36" FontWeight="Bold" FontFamily="Trebuchet MS" Height="52" Width="242" Grid.Column="1"/>
+        <Label x:Name="VersionLabel" Content="Version: &lt;Set in code&gt;" HorizontalAlignment="Left" Margin="3,44,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.266,0.03" Height="26" Width="130" Grid.Column="1"/>
+        <Image Grid.ColumnSpan="2" Margin="216,91,260.667,144" Source="PG_Shield_t.png" Stretch="Fill" RenderTransformOrigin="-6.644,1.928">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="359.209"/>
+                    <TranslateTransform X="0.744" Y="1.765"/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <Image Grid.ColumnSpan="2" Margin="291,10,60.667,157" Source="PG_Shield_t.png" Stretch="Fill"/>
+
     </Grid>
 </Window>
