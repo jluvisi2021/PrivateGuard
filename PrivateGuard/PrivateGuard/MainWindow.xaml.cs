@@ -19,7 +19,7 @@ namespace PrivateGuard
         private readonly string username = "jluvisi";
 
         bool ShowFileKeyField = false;
-        public static float VersionID = 0.2F;
+        public static float VersionID = 0.3F;
 
         public void TestRWBinaryFile()
         {
@@ -69,6 +69,7 @@ namespace PrivateGuard
         {
             if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
+                
                 Close();
             }
 
@@ -128,6 +129,7 @@ namespace PrivateGuard
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
+            String a;
             if (UsernameField.Text != username)
             {
                 DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
@@ -143,6 +145,7 @@ namespace PrivateGuard
                 DisplayErrorMessage(ERROR_TYPES.NO_FILE_SELECTED);
                 return;
             }
+            a = SelectedFileField.Text;
             FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
             BinaryReader bw2 = new BinaryReader(fs2);
             string modifier_value;
@@ -168,7 +171,10 @@ namespace PrivateGuard
             }
             fs2.Close();
             bw2.Close();
-            MessageBox.Show("ALL GOOD!");
+            //MessageBox.Show("ALL GOOD!");
+            Database db = new Database(a);
+            db.Show();
+            Close();
             // All is good attempt to open file.
 
         }
@@ -236,7 +242,22 @@ namespace PrivateGuard
             Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(187, 192, 195));
         }
 
+        private void MinimizeProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
 
+        private void MinimizeProgramLabel_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Label lbl = sender as Label;
+            lbl.Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
+        }
+
+        private void MinimizeProgramLabel_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Label lbl = sender as Label;
+            lbl.Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
+        }
     }
 
 }

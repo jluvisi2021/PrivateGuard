@@ -33,7 +33,7 @@
         </Image>
         <Rectangle Grid.ColumnSpan="2" Fill="#FF434351" HorizontalAlignment="Left" Height="30" Stroke="#FF555569" VerticalAlignment="Top" Width="500" MouseDown="Rectangle_MouseDown"/>
         <Rectangle Grid.ColumnSpan="2" Fill="#FF171717" HorizontalAlignment="Left" Height="3" Margin="10,126,0,0" Stroke="#FF555569" VerticalAlignment="Top" Width="475"/>
-        <Label x:Name="ExitProgramLabel" Grid.ColumnSpan="2" Content="X" Margin="466,-11,0,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="32" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave"/>
+        <Label x:Name="ExitProgramLabel" Grid.ColumnSpan="2" Content="X" Margin="466,-9.25,0,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="32" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave"/>
         <Label x:Name="UsernameLabel" Grid.ColumnSpan="2" Content="Username" HorizontalAlignment="Left" Margin="10,144,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold"/>
         <Label x:Name="FileKeyLabel" Grid.ColumnSpan="2" Content="File Key" HorizontalAlignment="Left" Margin="10,195,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold"/>
         <Label x:Name="SelectedFileLabel" Grid.ColumnSpan="2" Content="Selected File" HorizontalAlignment="Left" Margin="10,246,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold" FontStyle="Italic"/>
@@ -107,6 +107,7 @@
             </TextBox.Effect>
 
         </TextBox>
+        <Label x:Name="MinimizeProgramLabel" Grid.ColumnSpan="2" Content="_" Margin="426,-29,39,0" VerticalAlignment="Top" Height="78" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave"/>
 
 
 

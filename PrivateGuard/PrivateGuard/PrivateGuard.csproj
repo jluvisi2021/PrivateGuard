@@ -98,15 +98,29 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PG_Windows\Database\Database.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PG_Windows\FileKeyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PG_Windows\GeneratedKey.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PG_Data\Cipher.cs" />
+    <Compile Include="PG_Windows\Database\Database.xaml.cs">
+      <DependentUpon>Database.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PG_Windows\FileKeyWindow.xaml.cs">
       <DependentUpon>FileKeyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PG_Windows\GeneratedKey.xaml.cs">
+      <DependentUpon>GeneratedKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -154,6 +168,39 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="PG_Windows\PG_Shield_t.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="PG_Windows\Database\PG_Shield_t.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ExportFile_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Save_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Close_red_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Add_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ASX_Edit_blue_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DeleteAllRows_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Key_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Timer_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ASX_Copy_blue_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Font_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -26,6 +26,8 @@ namespace PrivateGuard.PG_Windows
         public FileKeyWindow()
         {
             InitializeComponent();
+            Title = "Create your file key.";
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -74,6 +76,12 @@ namespace PrivateGuard.PG_Windows
                 }
                 Close();
             }
+        }
+        readonly Random rand = new Random();
+        private void GenerateSecureKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            GeneratedKey GenKeyWin = new GeneratedKey(rand.Next(8,32));
+            GenKeyWin.Show();
         }
     }
 }

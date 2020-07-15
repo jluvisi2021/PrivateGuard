@@ -1,0 +1,111 @@
+﻿<Window x:Class="PrivateGuard.PG_Windows.Database"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PrivateGuard.PG_Windows"
+        mc:Ignorable="d"
+        Title="Database" Height="450" Width="600" WindowStyle="None" ResizeMode="NoResize" Icon="PG_Shield_t.png">
+    <Grid Background="#FFA8A3A3">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="299"/>
+            <ColumnDefinition Width="301"/>
+        </Grid.ColumnDefinitions>
+        <Rectangle Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="600" Fill="#FF434351" MouseDown="Rectangle_MouseDown"/>
+        <Label x:Name="ExitProgramLabel" Content="X" Margin="270,-10,0,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="32" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
+        <Label x:Name="MinimizeProgramLabel" Content="_" Margin="238,-30,29,0" VerticalAlignment="Top" Height="78" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave" Grid.Column="2"/>
+        <Menu Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="199" Background="#FF565664" FontFamily="Trebuchet MS" FontWeight="Bold" MouseDown="Menu_MouseDown">
+            <MenuItem x:Name="FileMenuItem" Header="File" Height="28" Width="36" FontWeight="Bold">
+                <MenuItem x:Name="SaveItem" Header="Save" InputGestureText="Ctrl+S">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Save_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="ExportAsTextItem" Header="Export as Text" InputGestureText="Ctrl+T">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/ExportFile_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="ExitItem" Header="Exit" InputGestureText="">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Close_red_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                
+            </MenuItem>
+            <MenuItem x:Name="EditMenuItem" Header="Edit" Height="28" Width="36" FontWeight="Bold">
+                <MenuItem x:Name="AddEntryItem" Header="Add Entry" InputGestureText="Ctrl+E">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Add_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="RemoveEntryItem" Header="Remove Entry" InputGestureText="Ctrl+X">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Close_red_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="EditEntryItem" Header="Edit Entry" InputGestureText="Ctrl+W">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/ASX_Edit_blue_16x.png" />
+
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="DuplicateEntryItem" Header="Duplicate Entry" InputGestureText="Ctrl+L">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/ASX_Copy_blue_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="DeleteAllEntriesItem" Header="Delete All Entries" InputGestureText="">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/DeleteAllRows_16x.png" />
+
+
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem x:Name="UtilityMenuItem" Header="Utilities" Height="28" Width="58" FontWeight="Bold">
+                <MenuItem x:Name="GeneratePasswordItem" Header="Generate Password" InputGestureText="">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Key_16x.png" />
+
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem x:Name="SettingsMenuItem" Header="Settings" Height="28" Width="62" FontWeight="Bold">
+                <MenuItem x:Name="DisableIdleTimerItem" Header="Disable Idle Timer" InputGestureText="CTRL+P">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Timer_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="FontItem" Header="Font" InputGestureText="CTRL+F">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Font_16x.png" />
+                    </MenuItem.Icon>
+                    <MenuItem x:Name="SubFontTimesNewRomanItem" Header="Times New Roman" IsCheckable="True" StaysOpenOnClick="True">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Font_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="SubFontArialItem" Header="Arial" IsCheckable="True" StaysOpenOnClick="True">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Font_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="SubFontTrebuchetMSItem" Header="Trebuchet MS" IsCheckable="True" StaysOpenOnClick="True">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Font_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="SubFontCourierItem" Header="Courier" IsCheckable="True" StaysOpenOnClick="True">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Font_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Label x:Name="EditingLabel" Grid.ColumnSpan="3" Content="Editing: " HorizontalAlignment="Left" Margin="204,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="328"/>
+    </Grid>
+</Window>
