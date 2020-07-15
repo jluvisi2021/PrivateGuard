@@ -240,6 +240,7 @@ namespace PrivateGuard
         private void Click_for_Source_Code_MouseLeave(object sender, MouseEventArgs e)
         {
             Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(187, 192, 195));
+            
         }
 
         private void MinimizeProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
