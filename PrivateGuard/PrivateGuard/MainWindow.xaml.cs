@@ -1,28 +1,16 @@
-﻿using Microsoft.VisualBasic;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using PrivateGuard.PG_Data;
 using PrivateGuard.PG_Windows;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Remoting.Channels;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PrivateGuard
 {
-    
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -40,9 +28,9 @@ namespace PrivateGuard
 
             FileStream fs = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Create);
             BinaryWriter bw = new BinaryWriter(fs);
-            
+
             bw.Write(Cipher.Encrypt("Hello World! (2)", key));
-         
+
             bw.Close();
             fs.Close();
             FileStream fs2 = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Open);
@@ -56,11 +44,11 @@ namespace PrivateGuard
         public MainWindow()
         {
 
-            
+
             InitializeComponent();
             SetupPrimaryScreen();
-           
-            
+
+
         }
 
         /// <summary>
@@ -79,11 +67,11 @@ namespace PrivateGuard
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
                 Close();
             }
-            
+
         }
 
         private void ExitProgramLabel_MouseEnter(object sender, MouseEventArgs e)
@@ -107,6 +95,19 @@ namespace PrivateGuard
         {
             ShowFileKeyField = !ShowFileKeyField;
             ToggleViewButton.Content = ShowFileKeyField ? ToggleViewButton.Content = "Hide" : ToggleViewButton.Content = "Show";
+            if (ShowFileKeyField)
+            {
+                FileKeyField.Visibility = Visibility.Hidden;
+                ViewPasswordTextBox.Visibility = Visibility.Visible;
+                ViewPasswordTextBox.Text = FileKeyField.Password.ToString();
+            }
+            else
+            {
+                FileKeyField.Visibility = Visibility.Visible;
+                ViewPasswordTextBox.Visibility = Visibility.Hidden;
+                FileKeyField.Password = ViewPasswordTextBox.Text;
+            }
+
         }
 
 
@@ -121,23 +122,23 @@ namespace PrivateGuard
             {
                 string fileName = dlg.FileName;
                 SelectedFileField.Text = fileName;
-                
+
             }
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            if(UsernameField.Text != username)
+            if (UsernameField.Text != username)
             {
                 DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
                 return;
             }
-            if(string.IsNullOrWhiteSpace(FileKeyField.Text))
+            if (string.IsNullOrWhiteSpace(FileKeyField.Password.ToString()))
             {
                 DisplayErrorMessage(ERROR_TYPES.NO_FILE_KEY);
                 return;
             }
-            if(string.IsNullOrWhiteSpace(SelectedFileField.Text))
+            if (string.IsNullOrWhiteSpace(SelectedFileField.Text))
             {
                 DisplayErrorMessage(ERROR_TYPES.NO_FILE_SELECTED);
                 return;
@@ -147,7 +148,7 @@ namespace PrivateGuard
             string modifier_value;
             try
             {
-                modifier_value = Cipher.Decrypt(bw2.ReadString(), FileKeyField.Text);
+                modifier_value = Cipher.Decrypt(bw2.ReadString(), FileKeyField.Password.ToString());
 
             }
             catch (Exception)
@@ -158,7 +159,7 @@ namespace PrivateGuard
                 return;
             }
             //string data = bw2.ReadString();
-            if(modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+            if (modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
             {
                 DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
                 fs2.Close();
@@ -178,10 +179,10 @@ namespace PrivateGuard
         /// <param name="e"></param>
         private static void DisplayErrorMessage(ERROR_TYPES e)
         {
-            switch(e)
+            switch (e)
             {
                 case ERROR_TYPES.WRONG_CREDENTIALS:
-                    MessageBox.Show("Incorrect Credentials.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Incorrect Credentials. Please validate that the username and filekey are set properly.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 case ERROR_TYPES.NO_FILE_SELECTED:
                     MessageBox.Show("No file selected. Please select a file using the \"Select\" button.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -207,13 +208,13 @@ namespace PrivateGuard
         public static bool IsFileKeyValid(String str)
         {
 
-            if(str.Length > 4 && str.Length < 256 && !str.Contains(" ") && !string.IsNullOrWhiteSpace(str))
+            if (str.Length > 4 && str.Length < 256 && !str.Contains(" ") && !string.IsNullOrWhiteSpace(str))
             {
                 return true;
             }
             return false;
         }
-        
+
         private void NewFileButton_Click(object sender, RoutedEventArgs e)
         {
             FileKeyWindow win = new FileKeyWindow();
@@ -234,5 +235,8 @@ namespace PrivateGuard
         {
             Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(187, 192, 195));
         }
+
+
     }
+
 }

@@ -4,6 +4,64 @@
              xmlns:local="clr-namespace:PrivateGuard"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style TargetType="TextBox" x:Key="RoundedCornerTextBox">
+            
+                <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Foreground" Value="#FF070606"/>
+                <Setter Property="SelectionBrush" Value="#FFED687C"/>
+                <Setter Property="FontFamily" Value="SimSun"/>
+                <Setter Property="FontSize" Value="16"></Setter>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="AllowDrop" Value="false"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border CornerRadius="3" x:Name="Bd" Background="#FFC1B9B9" BorderBrush="Gray" BorderThickness="1" OpacityMask="{x:Null}">
+                                <ScrollViewer SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" x:Name="PART_ContentHost" Template="{DynamicResource ScrollViewerControlTemplate1}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Background" TargetName="Bd" Value="#FFC1B9B9"/>
+                                    <Setter Property="Foreground" Value="#FF070606"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            
+        </Style>
+        <Style TargetType="PasswordBox" x:Key="RoundCornerPasswordGray">
+            <Setter Property="PasswordChar" Value="•"/>
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Foreground" Value="#FF070606"/>
+            <Setter Property="SelectionBrush" Value="#FFED687C"/>
+            <Setter Property="FontFamily" Value="SimSun"/>
+            <Setter Property="FontSize" Value="16"></Setter>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border CornerRadius="3" x:Name="Bd" Background="#FFC1B9B9" BorderBrush="Gray" BorderThickness="1" OpacityMask="{x:Null}">
+                            <ScrollViewer SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" x:Name="PART_ContentHost" Template="{DynamicResource ScrollViewerControlTemplate1}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="Bd" Value="#FFC1B9B9"/>
+                                <Setter Property="Foreground" Value="#FF070606"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </Application.Resources>
+    
 </Application>
