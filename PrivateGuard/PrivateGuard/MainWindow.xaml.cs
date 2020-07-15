@@ -1,5 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.VisualBasic;
+using Microsoft.Win32;
 using PrivateGuard.PG_Data;
+using PrivateGuard.PG_Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,7 +31,7 @@ namespace PrivateGuard
         private readonly string username = "jluvisi";
 
         bool ShowFileKeyField = false;
-        public static float VersionID = 0.1F;
+        public static float VersionID = 0.2F;
 
         public void TestRWBinaryFile()
         {
@@ -39,14 +41,14 @@ namespace PrivateGuard
             FileStream fs = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Create);
             BinaryWriter bw = new BinaryWriter(fs);
             
-            bw.Write(AES.Encrypt("Hello World! (2)", key));
+            bw.Write(Cipher.Encrypt("Hello World! (2)", key));
          
             bw.Close();
             fs.Close();
             FileStream fs2 = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Open);
             BinaryReader bw2 = new BinaryReader(fs2);
 
-            string data = AES.Decrypt(bw2.ReadString(), key);
+            string data = Cipher.Decrypt(bw2.ReadString(), key);
             //string data = bw2.ReadString();
             SelectedFileField.Text = data;
 
@@ -57,7 +59,8 @@ namespace PrivateGuard
             
             InitializeComponent();
             SetupPrimaryScreen();
-            TestRWBinaryFile();
+           
+            
         }
 
         /// <summary>
@@ -110,7 +113,7 @@ namespace PrivateGuard
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
             // Open Window Selector and find .txt file (or binary file) to open.
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".pgm";
             dlg.Filter = "PGM Files (*.pgm)|*.pgm";
             Nullable<bool> result = dlg.ShowDialog();
@@ -118,6 +121,7 @@ namespace PrivateGuard
             {
                 string fileName = dlg.FileName;
                 SelectedFileField.Text = fileName;
+                
             }
         }
 
@@ -143,18 +147,22 @@ namespace PrivateGuard
             string modifier_value;
             try
             {
-                modifier_value = AES.Decrypt(bw2.ReadString(), FileKeyField.Text);
+                modifier_value = Cipher.Decrypt(bw2.ReadString(), FileKeyField.Text);
 
             }
-            catch (EncoderFallbackException)
+            catch (Exception)
             {
                 DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                fs2.Close();
+                bw2.Close();
                 return;
             }
             //string data = bw2.ReadString();
             if(modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
             {
                 DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                fs2.Close();
+                bw2.Close();
                 return;
             }
             fs2.Close();
@@ -196,42 +204,35 @@ namespace PrivateGuard
         {
 
         }
+        public static bool IsFileKeyValid(String str)
+        {
 
+            if(str.Length > 4 && str.Length < 256 && !str.Contains(" ") && !string.IsNullOrWhiteSpace(str))
+            {
+                return true;
+            }
+            return false;
+        }
+        
         private void NewFileButton_Click(object sender, RoutedEventArgs e)
         {
-            String FileKey = "8UHjPgXZzXCGkhxV2QCnooyJexUzvJrO";
+            FileKeyWindow win = new FileKeyWindow();
+            win.Show();
+        }
 
-            Stream myStream;
-            SaveFileDialog sfd = new SaveFileDialog();
-            
+        private void Click_for_Source_Code_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/jluvisi2021/PrivateGuard");
+        }
 
-            sfd.Filter = "PGM Files (*.pgm)|*.pgm";
-            sfd.FilterIndex = 1;
-            sfd.FileName = "MyManager";
-            sfd.RestoreDirectory = true;
-            Nullable<bool> result = sfd.ShowDialog();
+        private void Click_for_Source_Code_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(63, 128, 232));
+        }
 
-            if (result==true)
-            {
-                if ((myStream = sfd.OpenFile()) != null)
-                {
-                    MessageBox.Show($"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.","Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
-                    myStream.Close();
-                    Dispatcher.Invoke(() =>
-                    {
-                        FileStream fs = new FileStream(sfd.FileName, FileMode.Open);
-                        BinaryWriter bw = new BinaryWriter(fs);
-                        bw.Write(AES.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", FileKey));
-
-                        bw.Close();
-                        fs.Close();
-                    });
-                   
-                    // Code to write the stream goes here.
-                    
-                    
-                }
-            }
+        private void Click_for_Source_Code_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(187, 192, 195));
         }
     }
 }

@@ -1,0 +1,15 @@
+﻿<Window x:Class="PrivateGuard.PG_Windows.FileKeyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PrivateGuard.PG_Windows"
+        mc:Ignorable="d"
+        Title="FileKeyWindow" Height="350" Width="450" Icon="PG_Shield_t.png">
+    <Grid>
+        <TextBlock x:Name="ImportantLabel" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Create a File Key for your new Password Database here. The &quot;.PGM&quot; files each require there own seperate file key to access.&#xA;NOTE &amp; Requirments:&#xA;- File Keys CANNOT be recovered.&#xA;- Your file key must NOT contain spaces.&#xA;- Your file key must be over 4 characters long.&#xA;- The longer (and the more character complex) the file key the harder it is to crack." VerticalAlignment="Top" Height="158" Width="423" FontFamily="Trebuchet MS" FontSize="15"/>
+        <Label Content="The filekey for this new file:" HorizontalAlignment="Left" Margin="10,173,0,0" VerticalAlignment="Top" Width="260" FontFamily="Trebuchet MS" FontSize="18" FontWeight="Bold" FontStyle="Italic"/>
+        <TextBox x:Name="FileKeyTextBlock" HorizontalAlignment="Left" Height="102" Margin="10,209,0,0" TextWrapping="Wrap" Text="Type your key here." VerticalAlignment="Top" Width="423" FontFamily="Trebuchet MS" FontSize="14"/>
+        <Button Content="Finish" HorizontalAlignment="Left" Margin="331,168,0,0" VerticalAlignment="Top" Width="89" FontFamily="Trebuchet MS" Height="31" Click="Button_Click"/>
+    </Grid>
+</Window>

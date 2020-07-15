@@ -93,6 +93,11 @@
         <Button x:Name="OpenFileButton" Grid.ColumnSpan="2" Content="Open File" HorizontalAlignment="Left" Margin="35,295,0,0" VerticalAlignment="Top" Width="105" Height="34" Background="#FFEF4848" FontFamily="Trebuchet MS" FontSize="16" FontWeight="Bold" BorderBrush="#FF5E5B5B" Click="OpenFileButton_Click"/>
         <Button x:Name="NewFileButton" ToolTip ="Create a new .PGM file in a specified location." Grid.ColumnSpan="2" Content="New File" HorizontalAlignment="Left" Margin="192,295,0,0" VerticalAlignment="Top" Width="105" Height="34" Background="#FFEF4848" FontFamily="Trebuchet MS" FontSize="16" FontWeight="Bold" BorderBrush="#FF5E5B5B" Click="NewFileButton_Click"/>
         <Button x:Name="DocumentationButton" Grid.ColumnSpan="2" Content="How to Use" HorizontalAlignment="Left" Margin="350,295,0,0" VerticalAlignment="Top" Width="105" Height="34" Background="#FFEF4848" FontFamily="Trebuchet MS" FontSize="16" FontWeight="Bold" BorderBrush="#FF5E5B5B" Click="DocumentationButton_Click"/>
+        <Label x:Name="Click_for_Source_Code" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,105,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontStyle="Italic" Foreground="#FFBBC0C3" FontWeight="Bold" MouseDown="Click_for_Source_Code_MouseDown" Background="#00000000" MouseEnter="Click_for_Source_Code_MouseEnter" MouseLeave="Click_for_Source_Code_MouseLeave">
+
+            <Underline>Github Source Hyperlink</Underline>
+        </Label>
+
 
     </Grid>
 </Window>
