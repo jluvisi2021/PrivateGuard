@@ -1,22 +1,11 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using PrivateGuard.PG_Windows.Database;
-using PrivateGuard.PG_Windows.Database.Database_Tools;
+﻿using PrivateGuard.Database_Tools;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PrivateGuard.PG_Windows
 {
@@ -29,20 +18,22 @@ namespace PrivateGuard.PG_Windows
     // dont allow users to select more than one font.
     public partial class Database : Window
     {
+        int SelectedEntry = -1;
         private string filename { get; set; }
         public Database(string filename)
         {
             InitializeComponent();
             this.filename = filename;
 
-            EditingLabel.Content = "Editing: " + this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length-1];
+            EditingLabel.Content = "Editing: " + this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1];
             SetupDataGrid();
-            
+
 
         }
 
         public void SetupDataGrid()
         {
+            
             DataGridTextColumn TextColumn = new DataGridTextColumn();
             TextColumn.Header = "ID #";
             TextColumn.Binding = new Binding("ID");
@@ -52,6 +43,7 @@ namespace PrivateGuard.PG_Windows
             TextColumn = new DataGridTextColumn();
             TextColumn.Header = "Username";
             TextColumn.Width = 170;
+           
             TextColumn.Binding = new Binding("Username");
             PasswordDB.Columns.Add(TextColumn);
 
@@ -63,16 +55,17 @@ namespace PrivateGuard.PG_Windows
 
             TextColumn = new DataGridTextColumn();
             TextColumn.Header = "Notes";
-            TextColumn.Width = 170;
+            //TextColumn.Width = 170;
+            TextColumn.MaxWidth = 350;
             TextColumn.Binding = new Binding("Notes");
             PasswordDB.Columns.Add(TextColumn);
-
-            TestRows();
+            
+           
         }
 
         void TestRows()
         {
-            var Entry1 = new EntryObject(0, "jluvisi","1162","my account");
+            var Entry1 = new EntryObject(0, "jluvisi", "1162", "my account");
             PasswordDB.Items.Add(Entry1);
         }
 
@@ -132,7 +125,53 @@ namespace PrivateGuard.PG_Windows
 
         private void AddEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            
+            AddEntry Entry = new AddEntry(PasswordDB.Items.Count);
+            Entry.ShowDialog();
+            PasswordDB.Items.Add(Entry.entry);
+           
+            //PasswordDB.Items.Refresh();
+        }
+
+        private void PasswordDB_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            //  DataRowView DataRowView = (DataRowView)PasswordDB.SelectedItem;
+            //  int RowID = Convert.ToInt32(DataRowView.Row[0]);
+            //   SelectedEntry = RowID;
+           // var selectedItem = PasswordDB.SelectedItem as EntryObject;
+           // if (selectedItem != null)
+           //     MessageBox.Show(selectedItem.ID.ToString());
+           // MessageBox.Show("" + SelectedEntry);
+            e.Cancel = true;
+        }
+
+        // Get the ID when the user selects a new row.
+        private void PasswordDB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedItem = PasswordDB.SelectedItem as EntryObject;
+            if (selectedItem != null)
+                SelectedEntry = selectedItem.ID;
+        }
+
+        private void RemoveEntryItem_Click(object sender, RoutedEventArgs e)
+        {
+            if(SelectedEntry == -1)
+            {
+                MessageBox.Show("Select a row to remove first.", "Error removing entry.", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (MessageBox.Show($"Delete entry at {SelectedEntry}? (You cannot undo this)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning)==MessageBoxResult.OK)
+            {
+                PasswordDB.Items.RemoveAt(SelectedEntry);
+
+                for (int i = 0; i < PasswordDB.Items.Count; i++)
+                {
+                    EntryObject obj = PasswordDB.Items[i] as EntryObject;
+                    obj.ID = i;
+                    PasswordDB.Items.RemoveAt(i);
+                    PasswordDB.Items.Insert(i, obj);
+                }
+                return;
+            }
         }
     }
     public class EntryObject

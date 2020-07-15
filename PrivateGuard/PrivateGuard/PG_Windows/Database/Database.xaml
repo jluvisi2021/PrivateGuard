@@ -40,7 +40,7 @@
                         <Image Source="/Resources/Add_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="RemoveEntryItem" Header="Remove Entry" InputGestureText="Ctrl+X">
+                <MenuItem x:Name="RemoveEntryItem" Header="Remove Entry" InputGestureText="Ctrl+X" Click="RemoveEntryItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Close_red_16x.png" />
                     </MenuItem.Icon>
@@ -107,6 +107,6 @@
             </MenuItem>
         </Menu>
         <Label x:Name="EditingLabel" Grid.ColumnSpan="3" Content="Editing: " HorizontalAlignment="Left" Margin="204,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="328"/>
-        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="384" Margin="10,56,0,0" VerticalAlignment="Top" Width="580" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True"/>
+        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="384" Margin="10,56,0,0" VerticalAlignment="Top" Width="580" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged"/>
     </Grid>
 </Window>

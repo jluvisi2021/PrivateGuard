@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 
 namespace PrivateGuard.PG_Data
 {
@@ -49,7 +45,8 @@ namespace PrivateGuard.PG_Data
                         {
                             cs.Write(cipherBytes, 0, cipherBytes.Length);
                             cs.Close();
-                        } catch (Exception)
+                        }
+                        catch (Exception)
                         {
                             throw new EncoderFallbackException();
                         }
@@ -60,7 +57,7 @@ namespace PrivateGuard.PG_Data
             return cipherText;
         }
 
-      
+
     }
 
 }

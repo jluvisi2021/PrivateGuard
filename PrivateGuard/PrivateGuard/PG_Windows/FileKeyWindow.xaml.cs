@@ -1,19 +1,8 @@
 ﻿using Microsoft.Win32;
 using PrivateGuard.PG_Data;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PrivateGuard.PG_Windows
 {
@@ -27,12 +16,12 @@ namespace PrivateGuard.PG_Windows
         {
             InitializeComponent();
             Title = "Create your file key.";
-            
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if(!MainWindow.IsFileKeyValid(FileKeyTextBlock.Text))
+            if (!MainWindow.IsFileKeyValid(FileKeyTextBlock.Text))
             {
                 FileKeyTextBlock.Text = "";
                 MessageBox.Show("File key not valid! Please meet the requirments listed.", "File Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -41,7 +30,7 @@ namespace PrivateGuard.PG_Windows
             {
                 Key = FileKeyTextBlock.Text;
                 MessageBox.Show("File key accepted. Please choose a location to save the password database file.", "Save file.", MessageBoxButton.OK, MessageBoxImage.Information);
-                
+
 
                 Stream myStream;
                 SaveFileDialog sfd = new SaveFileDialog();
@@ -80,7 +69,7 @@ namespace PrivateGuard.PG_Windows
         readonly Random rand = new Random();
         private void GenerateSecureKeyButton_Click(object sender, RoutedEventArgs e)
         {
-            GeneratedKey GenKeyWin = new GeneratedKey(rand.Next(8,32));
+            GeneratedKey GenKeyWin = new GeneratedKey(rand.Next(8, 32));
             GenKeyWin.Show();
         }
     }

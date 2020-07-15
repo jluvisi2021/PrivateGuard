@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using PrivateGuard.Database_Tools;
 using PrivateGuard.PG_Data;
 using PrivateGuard.PG_Windows;
 using System;
@@ -30,7 +31,8 @@ namespace PrivateGuard
             BinaryWriter bw = new BinaryWriter(fs);
 
             bw.Write(Cipher.Encrypt("Hello World! (2)", key));
-
+            
+           
             bw.Close();
             fs.Close();
             FileStream fs2 = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Open);
@@ -145,37 +147,45 @@ namespace PrivateGuard
                 DisplayErrorMessage(ERROR_TYPES.NO_FILE_SELECTED);
                 return;
             }
-            a = SelectedFileField.Text;
-            FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
-            BinaryReader bw2 = new BinaryReader(fs2);
-            string modifier_value;
             try
             {
-                modifier_value = Cipher.Decrypt(bw2.ReadString(), FileKeyField.Password.ToString());
+                a = SelectedFileField.Text;
+                FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
+                BinaryReader bw2 = new BinaryReader(fs2);
+                string modifier_value;
+                try
+                {
+                    modifier_value = Cipher.Decrypt(bw2.ReadString(), FileKeyField.Password.ToString());
 
-            }
-            catch (Exception)
-            {
-                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                }
+                catch (Exception)
+                {
+                    DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                    fs2.Close();
+                    bw2.Close();
+                    return;
+                }
+                //string data = bw2.ReadString();
+                if (modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+                {
+                    DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                    fs2.Close();
+                    bw2.Close();
+                    return;
+                }
                 fs2.Close();
                 bw2.Close();
-                return;
-            }
-            //string data = bw2.ReadString();
-            if (modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+                //MessageBox.Show("ALL GOOD!");
+                Database db = new Database(a);
+                db.Show();
+                Close();
+                // All is good attempt to open file.
+            } catch (Exception)
             {
-                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
-                fs2.Close();
-                bw2.Close();
+                
+                DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
                 return;
             }
-            fs2.Close();
-            bw2.Close();
-            //MessageBox.Show("ALL GOOD!");
-            Database db = new Database(a);
-            db.Show();
-            Close();
-            // All is good attempt to open file.
 
         }
 
@@ -196,6 +206,9 @@ namespace PrivateGuard
                 case ERROR_TYPES.NO_FILE_KEY:
                     MessageBox.Show("No file key found. Please fill out the file key text box with the respective file key for the selected file.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
+                case ERROR_TYPES.FILE_NOT_FOUND:
+                    MessageBox.Show("Could not find the file specified! Does it exist?", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
                 default:
                     Console.WriteLine("Could not find error: " + e.ToString());
                     break;
@@ -204,7 +217,7 @@ namespace PrivateGuard
 
         enum ERROR_TYPES
         {
-            WRONG_CREDENTIALS, NO_FILE_SELECTED, NO_FILE_KEY
+            WRONG_CREDENTIALS, NO_FILE_SELECTED, NO_FILE_KEY, FILE_NOT_FOUND
         }
 
         private void DocumentationButton_Click(object sender, RoutedEventArgs e)
@@ -240,7 +253,7 @@ namespace PrivateGuard
         private void Click_for_Source_Code_MouseLeave(object sender, MouseEventArgs e)
         {
             Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(187, 192, 195));
-            
+
         }
 
         private void MinimizeProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
