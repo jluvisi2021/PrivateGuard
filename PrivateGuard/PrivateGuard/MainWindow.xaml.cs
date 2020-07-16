@@ -147,6 +147,8 @@ namespace PrivateGuard
                 DisplayErrorMessage(ERROR_TYPES.NO_FILE_SELECTED);
                 return;
             }
+            string _Checkable = ShowFileKeyField ?  ViewPasswordTextBox.Text : FileKeyField.Password.ToString();
+            
             try
             {
                 a = SelectedFileField.Text;
@@ -155,7 +157,7 @@ namespace PrivateGuard
                 string modifier_value;
                 try
                 {
-                    modifier_value = Cipher.Decrypt(bw2.ReadString(), FileKeyField.Password.ToString());
+                    modifier_value = Cipher.Decrypt(bw2.ReadString(), _Checkable);
 
                 }
                 catch (Exception)
@@ -176,7 +178,16 @@ namespace PrivateGuard
                 fs2.Close();
                 bw2.Close();
                 //MessageBox.Show("ALL GOOD!");
-                Database db = new Database(a);
+                Database db;
+                if(ShowFileKeyField)
+                {
+                    db = new Database(a, ViewPasswordTextBox.Text);
+                }
+                else
+                {
+                    db = new Database(a, FileKeyField.Password.ToString());
+                }
+                
                 db.Show();
                 Close();
                 // All is good attempt to open file.

@@ -1,6 +1,8 @@
 ﻿using PrivateGuard.Database_Tools;
+using PrivateGuard.PG_Data;
 using System;
 using System.Data;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,16 +22,20 @@ namespace PrivateGuard.PG_Windows
     {
         int SelectedEntry = -1;
         private string filename { get; set; }
-        public Database(string filename)
+        private readonly string PrivateKey;
+        public Database(string filename, string privatekey)
         {
             InitializeComponent();
             this.filename = filename;
 
             EditingLabel.Content = "Editing: " + this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1];
             SetupDataGrid();
+            PrivateKey = privatekey;
 
 
         }
+
+
 
         public void SetupDataGrid()
         {
@@ -60,13 +66,8 @@ namespace PrivateGuard.PG_Windows
             TextColumn.Binding = new Binding("Notes");
             PasswordDB.Columns.Add(TextColumn);
             
+            // Setup a way to decode the values from the .pgm file.
            
-        }
-
-        void TestRows()
-        {
-            var Entry1 = new EntryObject(0, "jluvisi", "1162", "my account");
-            PasswordDB.Items.Add(Entry1);
         }
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
@@ -125,11 +126,19 @@ namespace PrivateGuard.PG_Windows
 
         private void AddEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            AddEntry Entry = new AddEntry(PasswordDB.Items.Count);
-            Entry.ShowDialog();
-            PasswordDB.Items.Add(Entry.entry);
-           
-            //PasswordDB.Items.Refresh();
+            try
+            {
+                AddEntry Entry = new AddEntry(PasswordDB.Items.Count);
+                Entry.ShowDialog();
+                if(Entry.entry == null)
+                {
+                    return;
+                }
+                PasswordDB.Items.Add(Entry.entry);
+
+                //PasswordDB.Items.Refresh();
+            }
+            catch (Exception) { }
         }
 
         private void PasswordDB_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
@@ -159,7 +168,7 @@ namespace PrivateGuard.PG_Windows
                 MessageBox.Show("Select a row to remove first.", "Error removing entry.", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            if (MessageBox.Show($"Delete entry at {SelectedEntry}? (You cannot undo this)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning)==MessageBoxResult.OK)
+            if (MessageBox.Show($"Delete entry at {SelectedEntry}?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning)==MessageBoxResult.OK)
             {
                 PasswordDB.Items.RemoveAt(SelectedEntry);
 
@@ -167,11 +176,89 @@ namespace PrivateGuard.PG_Windows
                 {
                     EntryObject obj = PasswordDB.Items[i] as EntryObject;
                     obj.ID = i;
+                    // Replace the object.
                     PasswordDB.Items.RemoveAt(i);
                     PasswordDB.Items.Insert(i, obj);
                 }
+                SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
                 return;
             }
+        }
+
+        private void EditEntryItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedEntry == -1)
+            {
+                MessageBox.Show("Select a row to edit first.", "Error editing entry.", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            EntryObject a = PasswordDB.Items[SelectedEntry] as EntryObject;
+            EditEntry Entry = new EditEntry(a);
+            Entry.ShowDialog();
+            if(Entry.entry == null)
+            {
+                return;
+            }
+            PasswordDB.Items.RemoveAt(Entry.entry.ID);
+            PasswordDB.Items.Insert(Entry.entry.ID, Entry.entry);
+            SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
+            return;
+        }
+
+        private void DuplicateEntryItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedEntry == -1)
+            {
+                MessageBox.Show("Select a row to copy first.", "Error copying entry.", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
+            obj.ID = PasswordDB.Items.Count;
+            // Deselect all items.
+            PasswordDB.SelectedItems.Clear();
+            PasswordDB.SelectedCells.Clear();
+            PasswordDB.Items.Add(obj);
+            SelectedEntry = -1;
+        }
+
+        private void DeleteAllEntriesItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show($"Delete ALL entries in the database?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+            {
+                PasswordDB.Items.Clear();
+            }
+            return;
+        }
+        private readonly string Seperator = "//JexUzvJrO";
+        private void SaveItem_Click(object sender, RoutedEventArgs e)
+        {
+            // Bless up <3
+            String FILE_PATH = filename;
+            
+            try
+            {
+                File.WriteAllText(FILE_PATH, String.Empty);
+                FileStream fs = new FileStream(filename, FileMode.Open);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", PrivateKey));
+                bw.Write(Environment.NewLine);
+            for (int i = 0; i < PasswordDB.Items.Count; i++)
+                {
+                    EntryObject temp = PasswordDB.Items[i] as EntryObject;
+                    bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Notes);
+                    bw.Write(Environment.NewLine);
+            }
+            } catch (Exception)
+            {
+                MessageBox.Show("Error while saving. Make sure program has read and write permissions and try again. If this continues to fail try running the program in administrator mode.", "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            } finally
+            {
+                bw.Close();
+                fs.Close();
+           }
+            MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            return;
         }
     }
     public class EntryObject

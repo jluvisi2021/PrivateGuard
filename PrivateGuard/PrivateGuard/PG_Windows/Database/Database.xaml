@@ -17,7 +17,7 @@
         <Label x:Name="MinimizeProgramLabel" Content="_" Margin="238,-30,29,0" VerticalAlignment="Top" Height="78" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave" Grid.Column="2"/>
         <Menu Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="199" Background="#FF565664" FontFamily="Trebuchet MS" FontWeight="Bold" MouseDown="Menu_MouseDown">
             <MenuItem x:Name="FileMenuItem" Header="File" Height="28" Width="36" FontWeight="Bold">
-                <MenuItem x:Name="SaveItem" Header="Save" InputGestureText="Ctrl+S">
+                <MenuItem x:Name="SaveItem" Header="Save" InputGestureText="Ctrl+S" Click="SaveItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Save_16x.png"/>
                     </MenuItem.Icon>
@@ -45,18 +45,18 @@
                         <Image Source="/Resources/Close_red_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="EditEntryItem" Header="Edit Entry" InputGestureText="Ctrl+W">
+                <MenuItem x:Name="EditEntryItem" Header="Edit Entry" InputGestureText="Ctrl+W" Click="EditEntryItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/ASX_Edit_blue_16x.png" />
 
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="DuplicateEntryItem" Header="Duplicate Entry" InputGestureText="Ctrl+L">
+                <MenuItem x:Name="DuplicateEntryItem" Header="Duplicate Entry" InputGestureText="Ctrl+L" Click="DuplicateEntryItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/ASX_Copy_blue_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="DeleteAllEntriesItem" Header="Delete All Entries" InputGestureText="">
+                <MenuItem x:Name="DeleteAllEntriesItem" Header="Delete All Entries" InputGestureText="" Click="DeleteAllEntriesItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/DeleteAllRows_16x.png" />
 
