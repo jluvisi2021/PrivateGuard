@@ -27,7 +27,7 @@
                         <Image Source="/Resources/ExportFile_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="ExitItem" Header="Exit" InputGestureText="">
+                <MenuItem x:Name="ExitItem" Header="Exit" InputGestureText="" Click="ExitItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Close_red_16x.png" />
                     </MenuItem.Icon>
@@ -106,7 +106,24 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Label x:Name="EditingLabel" Grid.ColumnSpan="3" Content="Editing: " HorizontalAlignment="Left" Margin="204,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="328"/>
-        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="384" Margin="10,56,0,0" VerticalAlignment="Top" Width="580" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged"/>
+        <Label x:Name="EditingLabel" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="204,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="328"/>
+        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="379" Margin="10,61,0,0" VerticalAlignment="Top" Width="580" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged"/>
+        <Button x:Name="CopyUsernameButton" Grid.ColumnSpan="2" Content="Copy Username" HorizontalAlignment="Left" Margin="10,32,0,0" VerticalAlignment="Top" Width="148" Height="24" FontFamily="Trebuchet MS" ToolTip ="Click to show the File Key." FontWeight="Bold" FontSize="13" RenderTransformOrigin="0.479,1.015" Click="CopyUsernameButton_Click">
+
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button x:Name="CopyPasswordButton" Grid.ColumnSpan="3" Content="Copy Password" HorizontalAlignment="Left" Margin="169,32,0,0" VerticalAlignment="Top" Width="148" Height="24" FontFamily="Trebuchet MS" ToolTip ="Click to show the File Key." FontWeight="Bold" FontSize="13" RenderTransformOrigin="0.479,1.015" Click="CopyPasswordButton_Click">
+
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <ProgressBar x:Name="ProgressBar" Grid.Column="2" Margin="150,33,10,393" LargeChange="10"/>
     </Grid>
 </Window>

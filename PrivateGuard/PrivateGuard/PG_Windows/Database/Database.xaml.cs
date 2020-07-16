@@ -3,6 +3,9 @@ using PrivateGuard.PG_Data;
 using System;
 using System.Data;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -72,7 +75,7 @@ namespace PrivateGuard.PG_Windows
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            if (MessageBox.Show("Exit PrivateGuard?\nAny unsaved data will be lost.", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
                 Close();
             }
@@ -234,12 +237,22 @@ namespace PrivateGuard.PG_Windows
         {
             // Bless up <3
             String FILE_PATH = filename;
-            
             try
             {
                 File.WriteAllText(FILE_PATH, String.Empty);
-                FileStream fs = new FileStream(filename, FileMode.Open);
-                BinaryWriter bw = new BinaryWriter(fs);
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Error while saving. Make sure program has read and write permissions and try again. If this continues to fail try running the program in administrator mode.", "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            
+            FileStream fs = null;
+            BinaryWriter bw = null;
+            try
+            {
+                fs = new FileStream(filename, FileMode.Open);
+                bw = new BinaryWriter(fs);
                 bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", PrivateKey));
                 bw.Write(Environment.NewLine);
             for (int i = 0; i < PasswordDB.Items.Count; i++)
@@ -259,6 +272,26 @@ namespace PrivateGuard.PG_Windows
            }
             MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             return;
+        }
+
+        private void ExitItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Exit PrivateGuard?\nAny unsaved data will be lost.", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            {
+                Close();
+            }
+        }
+
+        
+        private void CopyPasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+           
+        }
+
+
+        private void CopyUsernameButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
     public class EntryObject
