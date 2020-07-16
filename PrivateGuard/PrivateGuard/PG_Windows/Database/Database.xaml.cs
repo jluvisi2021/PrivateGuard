@@ -20,6 +20,7 @@ namespace PrivateGuard.PG_Windows
     // dont allow users to select more than one font.
     public partial class Database : Window
     {
+
         int SelectedEntry = -1;
         private string filename { get; set; }
         private readonly string PrivateKey;
@@ -60,9 +61,16 @@ namespace PrivateGuard.PG_Windows
             PasswordDB.Columns.Add(TextColumn);
 
             TextColumn = new DataGridTextColumn();
+            TextColumn.Header = "Date";
+            //TextColumn.Width = 170;
+            TextColumn.Width = 100;
+            TextColumn.Binding = new Binding("Date");
+            PasswordDB.Columns.Add(TextColumn);
+
+            TextColumn = new DataGridTextColumn();
             TextColumn.Header = "Notes";
             //TextColumn.Width = 170;
-            TextColumn.MaxWidth = 350;
+            TextColumn.MaxWidth = 390;
             TextColumn.Binding = new Binding("Notes");
             PasswordDB.Columns.Add(TextColumn);
             
@@ -134,6 +142,7 @@ namespace PrivateGuard.PG_Windows
                 {
                     return;
                 }
+                
                 PasswordDB.Items.Add(Entry.entry);
 
                 //PasswordDB.Items.Refresh();
@@ -234,18 +243,19 @@ namespace PrivateGuard.PG_Windows
         {
             // Bless up <3
             String FILE_PATH = filename;
-            
+            FileStream fs = null;
+            BinaryWriter bw = null;
             try
             {
                 File.WriteAllText(FILE_PATH, String.Empty);
-                FileStream fs = new FileStream(filename, FileMode.Open);
-                BinaryWriter bw = new BinaryWriter(fs);
+                 fs = new FileStream(filename, FileMode.Open);
+                 bw = new BinaryWriter(fs);
                 bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", PrivateKey));
                 bw.Write(Environment.NewLine);
             for (int i = 0; i < PasswordDB.Items.Count; i++)
                 {
                     EntryObject temp = PasswordDB.Items[i] as EntryObject;
-                    bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Notes);
+                    bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
                     bw.Write(Environment.NewLine);
             }
             } catch (Exception)
@@ -266,13 +276,18 @@ namespace PrivateGuard.PG_Windows
         public int ID { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+
+        public string Date { get; set; }
         public string Notes { get; set; }
 
-        public EntryObject(int ID, string Username, string Password, string Notes)
+        
+
+        public EntryObject(int ID, string Username, string Password, string Date, string Notes)
         {
             this.ID = ID;
             this.Username = Username;
             this.Password = Password;
+            this.Date = Date;
             this.Notes = Notes;
         }
 

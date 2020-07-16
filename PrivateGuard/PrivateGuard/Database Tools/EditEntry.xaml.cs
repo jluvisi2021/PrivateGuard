@@ -40,7 +40,7 @@ namespace PrivateGuard.Database_Tools
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
 
-            EntryObject obj = new EntryObject(entry.ID, UsernameField.Text, PasswordField.Text, NotesField.Text);
+            EntryObject obj = new EntryObject(entry.ID, UsernameField.Text, PasswordField.Text, DateTime.Today.ToShortDateString(), NotesField.Text);
             entry = obj;
             Close();
         }
