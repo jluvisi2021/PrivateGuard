@@ -39,7 +39,10 @@ namespace PrivateGuard.Database_Tools
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (string.IsNullOrWhiteSpace(UsernameField.Text) || string.IsNullOrEmpty(PasswordField.Text)) {
+                MessageBox.Show("You cannot leave the username field or password field empty!", "Error while saving.", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             EntryObject obj = new EntryObject(entry.ID, UsernameField.Text, PasswordField.Text, DateTime.Today.ToShortDateString(), NotesField.Text);
             entry = obj;
             Close();
