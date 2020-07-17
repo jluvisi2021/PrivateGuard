@@ -149,8 +149,8 @@ namespace PrivateGuard
             }
             string _Checkable = ShowFileKeyField ?  ViewPasswordTextBox.Text : FileKeyField.Password.ToString();
             
-            try
-            {
+           // try
+           // {
                 a = SelectedFileField.Text;
                 FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
                 BinaryReader bw2 = new BinaryReader(fs2);
@@ -191,12 +191,12 @@ namespace PrivateGuard
                 db.Show();
                 Close();
                 // All is good attempt to open file.
-            } catch (Exception)
-            {
+           // } catch (Exception)
+          // {
                 
-                DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
-                return;
-            }
+                //DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
+            //    return;
+           // }
 
         }
 

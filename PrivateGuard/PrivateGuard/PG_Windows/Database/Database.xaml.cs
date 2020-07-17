@@ -1,11 +1,16 @@
 ﻿using PrivateGuard.Database_Tools;
 using PrivateGuard.PG_Data;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -73,9 +78,41 @@ namespace PrivateGuard.PG_Windows
             TextColumn.MaxWidth = 390;
             TextColumn.Binding = new Binding("Notes");
             PasswordDB.Columns.Add(TextColumn);
-            
+
             // Setup a way to decode the values from the .pgm file.
-           
+            byte[] FileBytes = File.ReadAllBytes(filename);
+            string RawData = Encoding.UTF8.GetString(FileBytes);
+            
+            // Decrypt something
+            // Split string on each of its lines.
+            string[] b = RawData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            // Make it into a list for ease of access.
+            List<string> SeperateObjectValues = new List<string>();
+            foreach(string s in b)
+            {
+                if(s.Length == 0)
+                {
+                    break;
+                }
+                //MessageBox.Show("s is: " + s + "\nLength:"+s.Length);
+                string a = s.Substring(1, s.Length-1);
+                SeperateObjectValues.Add(a);
+            }
+
+            SeperateObjectValues.RemoveAt(0); // Remove the header.
+        
+            for(int i = 0; i < SeperateObjectValues.Count; i+=5)
+            {
+               
+                string ID = SeperateObjectValues[i].Substring(0, SeperateObjectValues[i].Length-1);
+                string Username = SeperateObjectValues[i+1];
+                string Password = SeperateObjectValues[i+2];
+                string Date = SeperateObjectValues[i+3];
+                string Notes = SeperateObjectValues[i+4];
+                EntryObject entry = new EntryObject(int.Parse(ID.Trim()), Username, Password, Date, Notes);
+                PasswordDB.Items.Add(entry);
+               
+            }
         }
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
@@ -238,7 +275,7 @@ namespace PrivateGuard.PG_Windows
             }
             return;
         }
-        private readonly string Seperator = "//JexUzvJrO";
+        //private readonly string Seperator = "//JexUzvJrO";
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
             // Bless up <3
@@ -255,7 +292,17 @@ namespace PrivateGuard.PG_Windows
             for (int i = 0; i < PasswordDB.Items.Count; i++)
                 {
                     EntryObject temp = PasswordDB.Items[i] as EntryObject;
-                    bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
+                    // Write each value on a seperate line.
+                    //bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
+                    bw.Write(Cipher.Encrypt(""+i, PrivateKey));
+                    bw.Write(Environment.NewLine);
+                    bw.Write(Cipher.Encrypt(temp.Username, PrivateKey));
+                    bw.Write(Environment.NewLine);
+                    bw.Write(Cipher.Encrypt(temp.Password, PrivateKey));
+                    bw.Write(Environment.NewLine);
+                    bw.Write(Cipher.Encrypt(temp.Date, PrivateKey));
+                    bw.Write(Environment.NewLine);
+                    bw.Write(Cipher.Encrypt(temp.Notes, PrivateKey));
                     bw.Write(Environment.NewLine);
             }
             } catch (Exception)
