@@ -6,14 +6,14 @@
         xmlns:local="clr-namespace:PrivateGuard.PG_Windows"
         mc:Ignorable="d"
         Title="Database" Height="450" Width="770" WindowStyle="None" ResizeMode="NoResize" Icon="PG_Shield_t.png">
-    <Grid Background="#FFA8A3A3">
+    <Grid Background="#FFA8A3A3" MouseMove="Grid_MouseMove">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="299"/>
             <ColumnDefinition Width="301"/>
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="770" Fill="#FF434351" MouseDown="Rectangle_MouseDown" Margin="0,0,-168,0"/>
-        <Label x:Name="ExitProgramLabel" Content="X" Margin="434,-11,-168,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="32" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
+        <Rectangle Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="823" Fill="#FF434351" MouseDown="Rectangle_MouseDown" Margin="0,0,-220,0"/>
+        <Label x:Name="ExitProgramLabel" Content="X" Margin="434,-9,-168,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="30" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
         <Label x:Name="MinimizeProgramLabel" Content="_" Margin="394,-29,-127,0" VerticalAlignment="Top" Height="57" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave" Grid.Column="2"/>
         <Menu x:Name="MenuBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="199" Background="#FF565664" FontFamily="Trebuchet MS" FontWeight="Bold" MouseDown="Menu_MouseDown">
             <MenuItem x:Name="FileMenuItem" Header="File" Height="28" Width="36" FontWeight="Bold">
@@ -65,7 +65,7 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem x:Name="UtilityMenuItem" Header="Utilities" Height="28" Width="58" FontWeight="Bold">
-                <MenuItem x:Name="GeneratePasswordItem" Header="Generate Password" InputGestureText="">
+                <MenuItem x:Name="GeneratePasswordItem" Header="Generate Password" InputGestureText="" Click="GeneratePasswordItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Key_16x.png" />
 
@@ -82,22 +82,27 @@
                     <MenuItem.Icon>
                         <Image Source="/Resources/Font_16x.png" />
                     </MenuItem.Icon>
-                    <MenuItem x:Name="SubFontTimesNewRomanItem" Header="Times New Roman" IsCheckable="True" StaysOpenOnClick="True">
+                    <MenuItem x:Name="SubFontTimesNewRomanItem" Header="Times New Roman" IsCheckable="True" StaysOpenOnClick="True" Click="SubFontTimesNewRomanItem_Click">
                         <MenuItem.Icon>
                             <Image Source="/Resources/Font_16x.png" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem x:Name="SubFontArialItem" Header="Arial" IsCheckable="True" StaysOpenOnClick="True">
+                    <MenuItem x:Name="SubFontArialItem" Header="Arial" IsCheckable="True" StaysOpenOnClick="True" Click="SubFontArialItem_Click">
                         <MenuItem.Icon>
                             <Image Source="/Resources/Font_16x.png" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem x:Name="SubFontTrebuchetMSItem" Header="Trebuchet MS" IsCheckable="True" StaysOpenOnClick="True">
+                    <MenuItem x:Name="SubFontTrebuchetMSItem" Header="Trebuchet MS" IsCheckable="True" StaysOpenOnClick="True" Click="SubFontTrebuchetMSItem_Click">
                         <MenuItem.Icon>
                             <Image Source="/Resources/Font_16x.png" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem x:Name="SubFontCourierItem" Header="Courier" IsCheckable="True" StaysOpenOnClick="True">
+                    <MenuItem x:Name="SubFontCourierItem" Header="Courier" IsCheckable="True" StaysOpenOnClick="True" Click="SubFontCourierItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Font_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="SubFontCalibriItem" Header="Calibri" IsCheckable="True" StaysOpenOnClick="True" Click="SubFontCalibriItem_Click">
                         <MenuItem.Icon>
                             <Image Source="/Resources/Font_16x.png" />
                         </MenuItem.Icon>

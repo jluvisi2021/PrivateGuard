@@ -4,7 +4,9 @@ using PrivateGuard.PG_Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,22 +26,122 @@ namespace PrivateGuard.PG_Windows
     {
 
         int SelectedEntry = -1;
-        private string filename { get; set; }
+        private string Filename { get; set; }
+        private readonly int CheckInterval = 60 * 1000;
         private readonly string PrivateKey;
         private bool IsIdleTimerEnabled = true;
+        private readonly CancellationTokenSource token = new CancellationTokenSource();
+        private readonly double[] MousePosition = new double[2];
+        private readonly double[] MousePositionOld = { 0.0, 0.0 };
+        private Timer _timer;
         public Database(string filename, string privatekey)
         {
-            InitializeComponent();
-            this.filename = filename;
 
-            EditingLabel.Content = "Editing: " + this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1];
+            InitializeComponent();
+            this.Filename = filename;
+
+            EditingLabel.Content = "Editing: " + this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1];
             SetupDataGrid();
             PrivateKey = privatekey;
-
-
+            // Run Idle Timer.
+            ManageIdle();
+            string Raw_Settings = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            // Change the global font.
+            GetSettingsFont(Raw_Settings);
+            SetIdleTimerValue();
         }
 
+        public void SetIdleTimerValue()
+        {
+            // Idle timer is on.
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            if (!b[3].Contains("Enabled"))
+            {
+                // Idle timer off.
+                IsIdleTimerEnabled = false;
+                DisableIdleTimerItem.Header = "Enable Idle Timer";
 
+            }
+        }
+
+        public void GetSettingsFont(string raw)
+        {
+            if (raw.Contains("Times New Roman"))
+            {
+                ChangeGlobalFont("Times New Roman");
+                SubFontTimesNewRomanItem.IsChecked = true;
+            }
+            else if (raw.Contains("Courier"))
+            {
+                ChangeGlobalFont("Courier");
+                SubFontCourierItem.IsChecked = true;
+            }
+            else if (raw.Contains("Trebuchet MS"))
+            {
+                ChangeGlobalFont("Trebuchet MS");
+                SubFontTrebuchetMSItem.IsChecked = true;
+            }
+            else if (raw.Contains("Arial"))
+            {
+                ChangeGlobalFont("Arial");
+                SubFontArialItem.IsChecked = true;
+            }
+            else if (raw.Contains("Calibri"))
+            {
+                ChangeGlobalFont("Calibri");
+                SubFontCalibriItem.IsChecked = true;
+            }
+            else
+            {
+                MessageBox.Show("Could not read font from settings file.\nIf you continue to get this error then try running the program as administrator.", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ChangeGlobalFont("Trebuchet MS");
+                SubFontTrebuchetMSItem.IsChecked = true;
+            }
+        }
+
+        public void ManageIdle()
+        {
+            _timer = new Timer(Tick, null, CheckInterval, Timeout.Infinite);
+        }
+
+        private void Tick(object state)
+        {
+
+            try
+            {
+                if (IsIdleTimerEnabled)
+                {
+                    Console.WriteLine("Checking Mouse Position...");
+                    if (MousePositionOld[0] == MousePosition[0] && MousePositionOld[1] == MousePosition[1])
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            MainWindow mw = new MainWindow();
+                            mw.Show();
+                            Close();
+                        });
+
+                        MessageBox.Show("Idle Timer has expired.\nYou have been returned to the home screen.", "Idle Timer", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Skipped Mouse Check.");
+                }
+            }
+            finally
+            {
+                _timer?.Change(CheckInterval, Timeout.Infinite);
+                Dispatcher.Invoke(() =>
+                {
+                    MousePositionOld[0] = Mouse.GetPosition(this).X;
+                    MousePositionOld[1] = Mouse.GetPosition(this).Y;
+                });
+
+            }
+        }
 
         public void SetupDataGrid()
         {
@@ -78,7 +180,7 @@ namespace PrivateGuard.PG_Windows
             PasswordDB.Columns.Add(TextColumn);
 
             // Setup a way to decode the values from the .pgm file.
-            byte[] FileBytes = File.ReadAllBytes(filename);
+            byte[] FileBytes = File.ReadAllBytes(Filename);
             string RawData = Encoding.UTF8.GetString(FileBytes);
 
             // Decrypt something
@@ -274,17 +376,16 @@ namespace PrivateGuard.PG_Windows
             }
             return;
         }
-        //private readonly string Seperator = "//JexUzvJrO";
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
             // Bless up <3
-            String FILE_PATH = filename;
+            String FILE_PATH = Filename;
             FileStream fs = null;
             BinaryWriter bw = null;
             try
             {
                 File.WriteAllText(FILE_PATH, String.Empty);
-                fs = new FileStream(filename, FileMode.Open);
+                fs = new FileStream(Filename, FileMode.Open);
                 bw = new BinaryWriter(fs);
                 bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", PrivateKey));
                 bw.Write(Environment.NewLine);
@@ -343,7 +444,7 @@ namespace PrivateGuard.PG_Windows
 
             sfd.Filter = "TXT Files (*.txt)|*.txt";
             sfd.FilterIndex = 1;
-            String _filename = this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1]; // Remove path
+            String _filename = this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1]; // Remove path
             String name = _filename.Substring(0, _filename.Length - 4); // Remove file extension.
 
             sfd.FileName = name + "_plain";
@@ -362,7 +463,7 @@ namespace PrivateGuard.PG_Windows
                     a.Add("Exported from Private Guard Password Manager. (V" + MainWindow.VersionID + ")");
                     a.Add("Exported on: " + DateTime.Now.ToString());
                     a.Add("File Key: " + PrivateKey);
-                    double length = new FileInfo(filename).Length;
+                    double length = new FileInfo(Filename).Length;
                     a.Add("Database Size: " + length / 1000 + " MB");
                     a.Add("<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->");
                     a.Add(""); // Add new line
@@ -391,12 +492,162 @@ namespace PrivateGuard.PG_Windows
             if (IsIdleTimerEnabled)
             {
                 menuItem.Header = "Disable Idle Timer";
+                // Idle timer is on.
+                String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                b[3] = "IDLE_TIMER: Enabled";
+                string NewText = string.Empty;
+                foreach (string s in b)
+                {
+                    NewText += s + Environment.NewLine;
+                }
+                File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
             }
             else
             {
                 menuItem.Header = "Enable Idle Timer";
+                // Idle timer is off.
+                String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                b[3] = "IDLE_TIMER: Disabled";
+                string NewText = string.Empty;
+                foreach (string s in b)
+                {
+                    NewText += s + Environment.NewLine;
+                }
+                File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
             }
 
+        }
+
+        private void GeneratePasswordItem_Click(object sender, RoutedEventArgs e)
+        {
+            PasswordGen pg = new PasswordGen();
+            pg.Show();
+        }
+
+        private void Grid_MouseMove(object sender, MouseEventArgs e)
+        {
+            MousePosition[0] = Mouse.GetPosition(this).X;
+            MousePosition[1] = Mouse.GetPosition(this).Y;
+            Console.WriteLine(MousePosition[0] + ", " + MousePosition[1]);
+            Console.WriteLine(MousePositionOld[0] + ", " + MousePositionOld[1]);
+            Console.WriteLine();
+
+        }
+
+        //TODO: Make fonts stay with local settings file.
+
+
+        private void ChangeGlobalFont(String font)
+        {
+            /// casting the content into panel
+            Panel mainContainer = (Panel)Content;
+
+            /// GetAll UIElement
+            UIElementCollection element = mainContainer.Children;
+
+            /// casting the UIElementCollection into List
+            List<FrameworkElement> lstElement = element.Cast<FrameworkElement>().ToList();
+
+            /// Geting all Control from list
+            var lstControl = lstElement.OfType<Control>();
+
+            foreach (Control contol in lstControl)
+            {
+                ///Hide all Controls
+                contol.FontFamily = new FontFamily(font);
+            }
+        }
+
+        private void SubFontTimesNewRomanItem_Click(object sender, RoutedEventArgs e)
+        {
+            SubFontArialItem.IsChecked = false;
+            SubFontTrebuchetMSItem.IsChecked = false;
+            SubFontCourierItem.IsChecked = false;
+            SubFontCalibriItem.IsChecked = false;
+            ChangeGlobalFont("Times New Roman");
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[4] = "GLOBAL_FONT: Times New Roman";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+        }
+
+        private void SubFontArialItem_Click(object sender, RoutedEventArgs e)
+        {
+            SubFontTimesNewRomanItem.IsChecked = false;
+            SubFontTrebuchetMSItem.IsChecked = false;
+            SubFontCourierItem.IsChecked = false;
+            SubFontCalibriItem.IsChecked = false;
+            ChangeGlobalFont("Arial");
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[4] = "GLOBAL_FONT: Arial";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+        }
+
+        private void SubFontTrebuchetMSItem_Click(object sender, RoutedEventArgs e)
+        {
+            SubFontArialItem.IsChecked = false;
+            SubFontTimesNewRomanItem.IsChecked = false;
+            SubFontCourierItem.IsChecked = false;
+            SubFontCalibriItem.IsChecked = false;
+            ChangeGlobalFont("Trebuchet MS");
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[4] = "GLOBAL_FONT: Trebuchet MS";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+        }
+
+        private void SubFontCourierItem_Click(object sender, RoutedEventArgs e)
+        {
+            SubFontArialItem.IsChecked = false;
+            SubFontTrebuchetMSItem.IsChecked = false;
+            SubFontTimesNewRomanItem.IsChecked = false;
+            SubFontCalibriItem.IsChecked = false;
+            ChangeGlobalFont("Courier");
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[4] = "GLOBAL_FONT: Courier";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+        }
+
+        private void SubFontCalibriItem_Click(object sender, RoutedEventArgs e)
+        {
+            SubFontArialItem.IsChecked = false;
+            SubFontTrebuchetMSItem.IsChecked = false;
+            SubFontTimesNewRomanItem.IsChecked = false;
+            SubFontCourierItem.IsChecked = false;
+            ChangeGlobalFont("Calibri");
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[4] = "GLOBAL_FONT: Calibri";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
         }
     }
     public class EntryObject : ICloneable

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DA435DD6-4B18-4EA5-B015-2844950A17A1}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>PrivateGuard</RootNamespace>
     <AssemblyName>PrivateGuard</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -63,6 +63,12 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
@@ -94,6 +100,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Database Tools\PasswordGen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -108,6 +118,9 @@
     <Compile Include="Database Tools\AddEntry.xaml.cs">
       <DependentUpon>AddEntry.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Database Tools\PasswordGen.xaml.cs">
+      <DependentUpon>PasswordGen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -120,10 +133,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PG_Windows\GeneratedKey.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PG_Data\Cipher.cs" />
@@ -132,9 +141,6 @@
     </Compile>
     <Compile Include="PG_Windows\FileKeyWindow.xaml.cs">
       <DependentUpon>FileKeyWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PG_Windows\GeneratedKey.xaml.cs">
-      <DependentUpon>GeneratedKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -217,6 +223,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Database Tools\Key_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Database Tools\PG_Shield_t.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

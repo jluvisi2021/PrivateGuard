@@ -20,28 +20,9 @@ namespace PrivateGuard
 
         bool ShowFileKeyField = false;
         public static float VersionID = 0.4F;
-
-        public void TestRWBinaryFile()
-        {
-            String key = "8UHjPgXZzXCGkhxV2QCnooyJexUzvJrO";
+        public static readonly string SETTINGS_DIR = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
 
 
-            FileStream fs = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Create);
-            BinaryWriter bw = new BinaryWriter(fs);
-
-            bw.Write(Cipher.Encrypt("Hello World! (2)", key));
-
-
-            bw.Close();
-            fs.Close();
-            FileStream fs2 = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Open);
-            BinaryReader bw2 = new BinaryReader(fs2);
-
-            string data = Cipher.Decrypt(bw2.ReadString(), key);
-            //string data = bw2.ReadString();
-            SelectedFileField.Text = data;
-
-        }
         public MainWindow()
         {
 
@@ -49,6 +30,26 @@ namespace PrivateGuard
             InitializeComponent();
             SetupPrimaryScreen();
 
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            // Access settings.bin file.
+            if (!File.Exists(appdata + "\\PrivateGuard"))
+            {
+                Directory.CreateDirectory(appdata + "\\PrivateGuard");
+                Console.WriteLine("Directory " + appdata + "\\PrivateGuard" + " not found.. Creating...");
+            }
+            if (!File.Exists(appdata + "\\PrivateGuard\\settings.bin"))
+            {
+                String[] testing =
+                {
+                    "Private Guard Settings File: (V." + VersionID + ")",
+                    "Created On: " + DateTime.Now.ToString(),
+                    "",
+                    "IDLE_TIMER: Enabled",
+                    "GLOBAL_FONT: Trebuchet MS"
+                };
+                File.WriteAllLines(appdata + "\\PrivateGuard\\settings.bin", testing);
+                Console.WriteLine("Creating settings file.");
+            }
 
         }
 

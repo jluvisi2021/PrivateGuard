@@ -69,8 +69,14 @@ namespace PrivateGuard.PG_Windows
         readonly Random rand = new Random();
         private void GenerateSecureKeyButton_Click(object sender, RoutedEventArgs e)
         {
-            GeneratedKey GenKeyWin = new GeneratedKey(rand.Next(8, 32));
-            GenKeyWin.Show();
+            String gen = "";
+            char[] PasswordGenOptionals = "abcdefghikjlmnopqrstuvwxyz1234567890!@#$%^&*()[]{}:'>?/.<,ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            for (int i = 0; i < rand.Next(8,32); i++)
+            {
+
+                gen += PasswordGenOptionals[rand.Next(0, PasswordGenOptionals.Length - 1)];
+            }
+            FileKeyTextBlock.Text = gen;
         }
     }
 }
