@@ -22,12 +22,12 @@
                         <Image Source="/Resources/Save_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="ExportAsTextItem" Header="Export as Text" InputGestureText="Ctrl+T">
+                <MenuItem x:Name="ExportAsTextItem" Header="Export as Text" InputGestureText="Ctrl+T" Click="ExportAsTextItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/ExportFile_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="ExitItem" Header="Exit" InputGestureText="">
+                <MenuItem x:Name="ExitItem" Header="Exit" InputGestureText="" Click="ExitItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Close_red_16x.png" />
                     </MenuItem.Icon>

@@ -20,7 +20,7 @@ namespace PrivateGuard
         private readonly string username = "jluvisi";
 
         bool ShowFileKeyField = false;
-        public static float VersionID = 0.3F;
+        public static float VersionID = 0.4F;
 
         public void TestRWBinaryFile()
         {

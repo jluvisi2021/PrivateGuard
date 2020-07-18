@@ -1,4 +1,5 @@
-﻿using PrivateGuard.Database_Tools;
+﻿using Microsoft.Win32;
+using PrivateGuard.Database_Tools;
 using PrivateGuard.PG_Data;
 using System;
 using System.Collections.Generic;
@@ -259,11 +260,12 @@ namespace PrivateGuard.PG_Windows
                 return;
             }
             EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
-            obj.ID = PasswordDB.Items.Count;
+            EntryObject copy = (EntryObject)obj.Clone();
+            copy.ID = PasswordDB.Items.Count;
             // Deselect all items.
             PasswordDB.SelectedItems.Clear();
             PasswordDB.SelectedCells.Clear();
-            PasswordDB.Items.Add(obj);
+            PasswordDB.Items.Add(copy);
             SelectedEntry = -1;
         }
 
@@ -317,8 +319,62 @@ namespace PrivateGuard.PG_Windows
             MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             return;
         }
+
+        private void ExitItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Return to Main Menu?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            {
+                MainWindow mw = new MainWindow();
+                mw.Show();
+                Close();
+            }
+        }
+
+        /// <summary>
+        /// Creates a text file then uses the ToString() methods on all of the objects
+        /// currently in the database table.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExportAsTextItem_Click(object sender, RoutedEventArgs e)
+        {
+            Stream myStream;
+            SaveFileDialog sfd = new SaveFileDialog();
+
+
+            sfd.Filter = "TXT Files (*.txt)|*.txt";
+            sfd.FilterIndex = 1;
+            String name = this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1].Replace(".pgm", string.Empty);
+
+            sfd.FileName = name + "_plain";
+            sfd.RestoreDirectory = true;
+            Nullable<bool> result = sfd.ShowDialog();
+
+            if (result == true)
+            {
+                if ((myStream = sfd.OpenFile()) != null)
+                {
+                    MessageBox.Show($"Saved plain text passwords file at {sfd.FileName}!\nRemember these passwords are unencrypted so handle them carefully.", "Saved!", MessageBoxButton.OK, MessageBoxImage.Information);
+                    myStream.Close();
+                    List<string> a = new List<string>();
+                    a.Add("Passwords File");
+                    a.Add("Exported from Private Guard Password manager.");
+                    a.Add("Exported on: " + DateTime.Now.ToString());
+                    a.Add(""); // Add new line
+                    for(int i = 0; i < PasswordDB.Items.Count; i++)
+                    {
+                        EntryObject en = PasswordDB.Items[i] as EntryObject;
+                        a.Add(en.ToString());
+                    }
+                    string[] lines = a.ToArray();
+                    
+                    
+                    File.WriteAllLines(sfd.FileName, lines);
+                }
+            }
+        }
     }
-    public class EntryObject
+    public class EntryObject : ICloneable
     {
         public int ID { get; set; }
         public string Username { get; set; }
@@ -336,6 +392,20 @@ namespace PrivateGuard.PG_Windows
             this.Password = Password;
             this.Date = Date;
             this.Notes = Notes;
+        }
+
+        /// <summary>
+        /// Creates a shallow clone of the object in new memory.
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public override string ToString()
+        {
+            return $"ID: {this.ID}, Username:{this.Username}, Password:{this.Password}, Date: {this.Date}, Notes: {this.Notes}";
         }
 
 
