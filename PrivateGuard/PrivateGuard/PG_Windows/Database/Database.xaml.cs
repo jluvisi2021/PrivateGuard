@@ -3,15 +3,11 @@ using PrivateGuard.Database_Tools;
 using PrivateGuard.PG_Data;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -30,6 +26,7 @@ namespace PrivateGuard.PG_Windows
         int SelectedEntry = -1;
         private string filename { get; set; }
         private readonly string PrivateKey;
+        private bool IsIdleTimerEnabled = true;
         public Database(string filename, string privatekey)
         {
             InitializeComponent();
@@ -46,7 +43,7 @@ namespace PrivateGuard.PG_Windows
 
         public void SetupDataGrid()
         {
-            
+
             DataGridTextColumn TextColumn = new DataGridTextColumn();
             TextColumn.Header = "ID #";
             TextColumn.Binding = new Binding("ID");
@@ -56,7 +53,7 @@ namespace PrivateGuard.PG_Windows
             TextColumn = new DataGridTextColumn();
             TextColumn.Header = "Username";
             TextColumn.Width = 170;
-           
+
             TextColumn.Binding = new Binding("Username");
             PasswordDB.Columns.Add(TextColumn);
 
@@ -83,36 +80,36 @@ namespace PrivateGuard.PG_Windows
             // Setup a way to decode the values from the .pgm file.
             byte[] FileBytes = File.ReadAllBytes(filename);
             string RawData = Encoding.UTF8.GetString(FileBytes);
-            
+
             // Decrypt something
             // Split string on each of its lines.
             string[] b = RawData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             // Make it into a list for ease of access.
             List<string> SeperateObjectValues = new List<string>();
-            foreach(string s in b)
+            foreach (string s in b)
             {
-                if(s.Length == 0)
+                if (s.Length == 0)
                 {
                     break;
                 }
                 //MessageBox.Show("s is: " + s + "\nLength:"+s.Length);
-                string a = s.Substring(1, s.Length-1);
+                string a = s.Substring(1, s.Length - 1);
                 SeperateObjectValues.Add(a);
             }
 
             SeperateObjectValues.RemoveAt(0); // Remove the header.
-        
-            for(int i = 0; i < SeperateObjectValues.Count; i+=5)
+
+            for (int i = 0; i < SeperateObjectValues.Count; i += 5)
             {
-               
-                string ID = SeperateObjectValues[i].Substring(0, SeperateObjectValues[i].Length-1);
-                string Username = SeperateObjectValues[i+1];
-                string Password = SeperateObjectValues[i+2];
-                string Date = SeperateObjectValues[i+3];
-                string Notes = SeperateObjectValues[i+4];
+
+                string ID = SeperateObjectValues[i].Substring(0, SeperateObjectValues[i].Length - 1);
+                string Username = SeperateObjectValues[i + 1];
+                string Password = SeperateObjectValues[i + 2];
+                string Date = SeperateObjectValues[i + 3];
+                string Notes = SeperateObjectValues[i + 4];
                 EntryObject entry = new EntryObject(int.Parse(ID.Trim()), Username, Password, Date, Notes);
                 PasswordDB.Items.Add(entry);
-               
+
             }
         }
 
@@ -176,11 +173,11 @@ namespace PrivateGuard.PG_Windows
             {
                 AddEntry Entry = new AddEntry(PasswordDB.Items.Count);
                 Entry.ShowDialog();
-                if(Entry.entry == null)
+                if (Entry.entry == null)
                 {
                     return;
                 }
-                
+
                 PasswordDB.Items.Add(Entry.entry);
 
                 //PasswordDB.Items.Refresh();
@@ -193,10 +190,10 @@ namespace PrivateGuard.PG_Windows
             //  DataRowView DataRowView = (DataRowView)PasswordDB.SelectedItem;
             //  int RowID = Convert.ToInt32(DataRowView.Row[0]);
             //   SelectedEntry = RowID;
-           // var selectedItem = PasswordDB.SelectedItem as EntryObject;
-           // if (selectedItem != null)
-           //     MessageBox.Show(selectedItem.ID.ToString());
-           // MessageBox.Show("" + SelectedEntry);
+            // var selectedItem = PasswordDB.SelectedItem as EntryObject;
+            // if (selectedItem != null)
+            //     MessageBox.Show(selectedItem.ID.ToString());
+            // MessageBox.Show("" + SelectedEntry);
             e.Cancel = true;
         }
 
@@ -210,12 +207,12 @@ namespace PrivateGuard.PG_Windows
 
         private void RemoveEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            if(SelectedEntry == -1)
+            if (SelectedEntry == -1)
             {
                 MessageBox.Show("Select a row to remove first.", "Error removing entry.", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            if (MessageBox.Show($"Delete entry at {SelectedEntry}?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning)==MessageBoxResult.OK)
+            if (MessageBox.Show($"Delete entry at {SelectedEntry}?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
             {
                 PasswordDB.Items.RemoveAt(SelectedEntry);
 
@@ -242,7 +239,7 @@ namespace PrivateGuard.PG_Windows
             EntryObject a = PasswordDB.Items[SelectedEntry] as EntryObject;
             EditEntry Entry = new EditEntry(a);
             Entry.ShowDialog();
-            if(Entry.entry == null)
+            if (Entry.entry == null)
             {
                 return;
             }
@@ -287,16 +284,16 @@ namespace PrivateGuard.PG_Windows
             try
             {
                 File.WriteAllText(FILE_PATH, String.Empty);
-                 fs = new FileStream(filename, FileMode.Open);
-                 bw = new BinaryWriter(fs);
+                fs = new FileStream(filename, FileMode.Open);
+                bw = new BinaryWriter(fs);
                 bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", PrivateKey));
                 bw.Write(Environment.NewLine);
-            for (int i = 0; i < PasswordDB.Items.Count; i++)
+                for (int i = 0; i < PasswordDB.Items.Count; i++)
                 {
                     EntryObject temp = PasswordDB.Items[i] as EntryObject;
                     // Write each value on a seperate line.
                     //bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
-                    bw.Write(Cipher.Encrypt(""+i, PrivateKey));
+                    bw.Write(Cipher.Encrypt("" + i, PrivateKey));
                     bw.Write(Environment.NewLine);
                     bw.Write(Cipher.Encrypt(temp.Username, PrivateKey));
                     bw.Write(Environment.NewLine);
@@ -306,16 +303,18 @@ namespace PrivateGuard.PG_Windows
                     bw.Write(Environment.NewLine);
                     bw.Write(Cipher.Encrypt(temp.Notes, PrivateKey));
                     bw.Write(Environment.NewLine);
+                }
             }
-            } catch (Exception)
+            catch (Exception)
             {
                 MessageBox.Show("Error while saving. Make sure program has read and write permissions and try again. If this continues to fail try running the program in administrator mode.", "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
-            } finally
+            }
+            finally
             {
                 bw.Close();
                 fs.Close();
-           }
+            }
             MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             return;
         }
@@ -344,7 +343,8 @@ namespace PrivateGuard.PG_Windows
 
             sfd.Filter = "TXT Files (*.txt)|*.txt";
             sfd.FilterIndex = 1;
-            String name = this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1].Replace(".pgm", string.Empty);
+            String _filename = this.filename.Trim().Split('\\')[this.filename.Trim().Split('\\').Length - 1]; // Remove path
+            String name = _filename.Substring(0, _filename.Length - 4); // Remove file extension.
 
             sfd.FileName = name + "_plain";
             sfd.RestoreDirectory = true;
@@ -357,21 +357,46 @@ namespace PrivateGuard.PG_Windows
                     MessageBox.Show($"Saved plain text passwords file at {sfd.FileName}!\nRemember these passwords are unencrypted so handle them carefully.", "Saved!", MessageBoxButton.OK, MessageBoxImage.Information);
                     myStream.Close();
                     List<string> a = new List<string>();
-                    a.Add("Passwords File");
-                    a.Add("Exported from Private Guard Password manager.");
+                    a.Add("<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->");
+                    a.Add("[Passwords Plain Text File]");
+                    a.Add("Exported from Private Guard Password Manager. (V" + MainWindow.VersionID + ")");
                     a.Add("Exported on: " + DateTime.Now.ToString());
+                    a.Add("File Key: " + PrivateKey);
+                    double length = new FileInfo(filename).Length;
+                    a.Add("Database Size: " + length / 1000 + " MB");
+                    a.Add("<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->");
                     a.Add(""); // Add new line
-                    for(int i = 0; i < PasswordDB.Items.Count; i++)
+                    for (int i = 0; i < PasswordDB.Items.Count; i++)
                     {
                         EntryObject en = PasswordDB.Items[i] as EntryObject;
                         a.Add(en.ToString());
                     }
                     string[] lines = a.ToArray();
-                    
-                    
+
+
                     File.WriteAllLines(sfd.FileName, lines);
                 }
             }
+        }
+
+        /// <summary>
+        /// Toggle the idle timer. (on/off)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DisableIdleTimerItem_Click(object sender, RoutedEventArgs e)
+        {
+            IsIdleTimerEnabled = !IsIdleTimerEnabled;
+            var menuItem = (MenuItem)e.OriginalSource;
+            if (IsIdleTimerEnabled)
+            {
+                menuItem.Header = "Disable Idle Timer";
+            }
+            else
+            {
+                menuItem.Header = "Enable Idle Timer";
+            }
+
         }
     }
     public class EntryObject : ICloneable
@@ -383,7 +408,7 @@ namespace PrivateGuard.PG_Windows
         public string Date { get; set; }
         public string Notes { get; set; }
 
-        
+
 
         public EntryObject(int ID, string Username, string Password, string Date, string Notes)
         {
@@ -405,7 +430,7 @@ namespace PrivateGuard.PG_Windows
 
         public override string ToString()
         {
-            return $"ID: {this.ID}, Username:{this.Username}, Password:{this.Password}, Date: {this.Date}, Notes: {this.Notes}";
+            return $"ID: {this.ID} | Username:{this.Username} | Password:{this.Password} | Date: {this.Date} | Notes: {this.Notes}";
         }
 
 

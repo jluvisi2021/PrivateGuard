@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using PrivateGuard.Database_Tools;
 using PrivateGuard.PG_Data;
 using PrivateGuard.PG_Windows;
 using System;
@@ -31,8 +30,8 @@ namespace PrivateGuard
             BinaryWriter bw = new BinaryWriter(fs);
 
             bw.Write(Cipher.Encrypt("Hello World! (2)", key));
-            
-           
+
+
             bw.Close();
             fs.Close();
             FileStream fs2 = new FileStream("C:\\Users\\jluvi\\Desktop\\test.pgm", FileMode.Open);
@@ -71,7 +70,7 @@ namespace PrivateGuard
         {
             if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
-                
+
                 Close();
             }
 
@@ -147,56 +146,56 @@ namespace PrivateGuard
                 DisplayErrorMessage(ERROR_TYPES.NO_FILE_SELECTED);
                 return;
             }
-            string _Checkable = ShowFileKeyField ?  ViewPasswordTextBox.Text : FileKeyField.Password.ToString();
-            
-           // try
-           // {
-                a = SelectedFileField.Text;
-                FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
-                BinaryReader bw2 = new BinaryReader(fs2);
-                string modifier_value;
-                try
-                {
-                    modifier_value = Cipher.Decrypt(bw2.ReadString(), _Checkable);
+            string _Checkable = ShowFileKeyField ? ViewPasswordTextBox.Text : FileKeyField.Password.ToString();
 
-                }
-                catch (Exception)
-                {
-                    DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
-                    fs2.Close();
-                    bw2.Close();
-                    return;
-                }
-                //string data = bw2.ReadString();
-                if (modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
-                {
-                    DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
-                    fs2.Close();
-                    bw2.Close();
-                    return;
-                }
+            // try
+            // {
+            a = SelectedFileField.Text;
+            FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
+            BinaryReader bw2 = new BinaryReader(fs2);
+            string modifier_value;
+            try
+            {
+                modifier_value = Cipher.Decrypt(bw2.ReadString(), _Checkable);
+
+            }
+            catch (Exception)
+            {
+                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
                 fs2.Close();
                 bw2.Close();
-                //MessageBox.Show("ALL GOOD!");
-                Database db;
-                if(ShowFileKeyField)
-                {
-                    db = new Database(a, ViewPasswordTextBox.Text);
-                }
-                else
-                {
-                    db = new Database(a, FileKeyField.Password.ToString());
-                }
-                
-                db.Show();
-                Close();
-                // All is good attempt to open file.
-           // } catch (Exception)
-          // {
-                
-                //DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
+                return;
+            }
+            //string data = bw2.ReadString();
+            if (modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+            {
+                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                fs2.Close();
+                bw2.Close();
+                return;
+            }
+            fs2.Close();
+            bw2.Close();
+            //MessageBox.Show("ALL GOOD!");
+            Database db;
+            if (ShowFileKeyField)
+            {
+                db = new Database(a, ViewPasswordTextBox.Text);
+            }
+            else
+            {
+                db = new Database(a, FileKeyField.Password.ToString());
+            }
+
+            db.Show();
+            Close();
+            // All is good attempt to open file.
+            // } catch (Exception)
+            // {
+
+            //DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
             //    return;
-           // }
+            // }
 
         }
 
