@@ -28,13 +28,13 @@ namespace PrivateGuard.PG_Windows
         int SelectedEntry = -1;
         private string Filename { get; set; }
         private readonly int CheckInterval = 60 * 1000;
+        private int SecondCount = 0;
         private string PrivateKey = "GAYLORD123";
         private bool IsIdleTimerEnabled = true;
         private readonly CancellationTokenSource token = new CancellationTokenSource();
         private readonly double[] MousePosition = new double[2];
         private readonly double[] MousePositionOld = { 0.0, 0.0 };
         private Timer _timer;
-        private Timer _autosavetimer;
         public Database(string filename, string privatekey)
         {
 
@@ -42,17 +42,14 @@ namespace PrivateGuard.PG_Windows
             this.Filename = filename;
             this.PrivateKey = privatekey;
             EditingLabel.Content = "Editing: " + this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1];
-            
-            SetupDataGrid();
 
-            // Run Idle Timer.
-            ManageIdle();
+            SetupDataGrid();
             string Raw_Settings = File.ReadAllText(MainWindow.SETTINGS_DIR);
             // Change the global font.
             GetSettingsFont(Raw_Settings);
             GetSettingsFontSize();
             SetIdleTimerValue();
-           
+
         }
 
         public void SetIdleTimerValue()
@@ -77,21 +74,22 @@ namespace PrivateGuard.PG_Windows
         {
             String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
             string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            if(b[5].Contains("8px"))
+            if (b[5].Contains("8px"))
             {
                 PasswordDB.FontSize = 8;
                 TextSize8PXItem.IsChecked = true;
-            }else if(b[5].Contains("12px"))
+            }
+            else if (b[5].Contains("12px"))
             {
                 PasswordDB.FontSize = 12;
                 TextSize12PXItem.IsChecked = true;
             }
-            else if(b[5].Contains("16px"))
+            else if (b[5].Contains("16px"))
             {
                 PasswordDB.FontSize = 16;
                 TextSize16PXItem.IsChecked = true;
             }
-            else if(b[5].Contains("20px"))
+            else if (b[5].Contains("20px"))
             {
                 PasswordDB.FontSize = 20;
                 TextSize20PXItem.IsChecked = true;
@@ -138,14 +136,6 @@ namespace PrivateGuard.PG_Windows
             }
         }
 
-        public void ManageIdle()
-        {
-            _timer = new Timer(Tick, null, CheckInterval, Timeout.Infinite);
-        }
-        public void ManageAutoSave()
-        {
-
-        }
 
         private void Tick(object state)
         {
@@ -329,17 +319,7 @@ namespace PrivateGuard.PG_Windows
             catch (Exception) { }
         }
 
-        private void PasswordDB_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            //  DataRowView DataRowView = (DataRowView)PasswordDB.SelectedItem;
-            //  int RowID = Convert.ToInt32(DataRowView.Row[0]);
-            //   SelectedEntry = RowID;
-            // var selectedItem = PasswordDB.SelectedItem as EntryObject;
-            // if (selectedItem != null)
-            //     MessageBox.Show(selectedItem.ID.ToString());
-            // MessageBox.Show("" + SelectedEntry);
-            e.Cancel = true;
-        }
+        private void PasswordDB_BeginningEdit(object sender, DataGridBeginningEditEventArgs e) => e.Cancel = true;
 
         // Get the ID when the user selects a new row.
         private void PasswordDB_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -568,9 +548,7 @@ namespace PrivateGuard.PG_Windows
         {
             MousePosition[0] = Mouse.GetPosition(this).X;
             MousePosition[1] = Mouse.GetPosition(this).Y;
-            Console.WriteLine(MousePosition[0] + ", " + MousePosition[1]);
-            Console.WriteLine(MousePositionOld[0] + ", " + MousePositionOld[1]);
-            Console.WriteLine();
+
 
         }
 
@@ -768,13 +746,133 @@ namespace PrivateGuard.PG_Windows
         private void HelpItem_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/jluvisi2021/PrivateGuard/wiki");
-        
+
         }
 
         private void ContactDevItem_Click(object sender, RoutedEventArgs e)
         {
             Contact c = new Contact();
             c.ShowDialog();
+        }
+
+        private void Copy_Password_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedEntry != -1)
+            {
+                EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
+                Clipboard.SetText(obj.Password);
+            }
+        }
+
+        private void CopyUsername_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedEntry != -1)
+            {
+                EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
+                Clipboard.SetText(obj.Username);
+            }
+        }
+
+        private void EditEntry_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedEntry == -1)
+            {
+                return;
+            }
+            EntryObject a = PasswordDB.Items[SelectedEntry] as EntryObject;
+            EditEntry Entry = new EditEntry(a);
+            Entry.ShowDialog();
+            if (Entry.entry == null)
+            {
+                return;
+            }
+            PasswordDB.Items.RemoveAt(Entry.entry.ID);
+            PasswordDB.Items.Insert(Entry.entry.ID, Entry.entry);
+            SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
+            return;
+        }
+
+        private void RemoveEntry_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedEntry == -1)
+            {
+                return;
+            }
+            if (MessageBox.Show($"Delete entry at {SelectedEntry}?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+            {
+                PasswordDB.Items.RemoveAt(SelectedEntry);
+
+                for (int i = 0; i < PasswordDB.Items.Count; i++)
+                {
+                    EntryObject obj = PasswordDB.Items[i] as EntryObject;
+                    obj.ID = i;
+                    // Replace the object.
+                    PasswordDB.Items.RemoveAt(i);
+                    PasswordDB.Items.Insert(i, obj);
+                }
+                SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
+                return;
+            }
+        }
+
+        private void SaveAsItem_Click(object sender, RoutedEventArgs e)
+        {
+            String Key1 = PrivateKey;
+            if (MessageBox.Show("Save with a different Encryption Key?\nThis will be the key you use to open this new file.", "Encryption Key", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                SaveAsNewKey NewKeyWindow = new SaveAsNewKey();
+                NewKeyWindow.ShowDialog();
+                Key1 = NewKeyWindow.NewKey;
+            }
+
+
+
+            Stream myStream;
+            SaveFileDialog sfd = new SaveFileDialog();
+
+
+            sfd.Filter = "PGM Files (*.pgm)|*.pgm";
+            sfd.FilterIndex = 1;
+            sfd.FileName = "MyManager";
+            sfd.RestoreDirectory = true;
+            Nullable<bool> result = sfd.ShowDialog();
+
+            if (result == true)
+            {
+                if ((myStream = sfd.OpenFile()) != null)
+                {
+                    MessageBox.Show($"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.", "Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
+                    myStream.Close();
+
+                    File.WriteAllText(sfd.FileName, String.Empty);
+                    FileStream fs = new FileStream(sfd.FileName, FileMode.Open);
+                    BinaryWriter bw = new BinaryWriter(fs);
+                    bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", Key1));
+                    bw.Write(Environment.NewLine);
+                    for (int i = 0; i < PasswordDB.Items.Count; i++)
+                    {
+                        EntryObject temp = PasswordDB.Items[i] as EntryObject;
+                        // Write each value on a seperate line.
+                        //bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
+                        bw.Write(Cipher.Encrypt("" + i, Key1));
+                        bw.Write(Environment.NewLine);
+                        bw.Write(Cipher.Encrypt(temp.Username, Key1));
+                        bw.Write(Environment.NewLine);
+                        bw.Write(Cipher.Encrypt(temp.Password, Key1));
+                        bw.Write(Environment.NewLine);
+                        bw.Write(Cipher.Encrypt(temp.Date, Key1));
+                        bw.Write(Environment.NewLine);
+                        bw.Write(Cipher.Encrypt(temp.Notes, Key1));
+                        bw.Write(Environment.NewLine);
+                    }
+                    bw.Close();
+                    fs.Close();
+
+                    // Code to write the stream goes here.
+
+
+                }
+            }
         }
     }
     public class EntryObject : ICloneable

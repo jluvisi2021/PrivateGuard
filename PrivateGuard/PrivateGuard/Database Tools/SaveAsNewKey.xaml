@@ -1,0 +1,29 @@
+﻿<Window x:Class="PrivateGuard.Database_Tools.SaveAsNewKey"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PrivateGuard.Database_Tools"
+        mc:Ignorable="d"
+        Title="SaveAsNewKey" Height="250" Width="400" ResizeMode="CanMinimize">
+    <Grid>
+        <Label x:Name="Title" Content="Enter the new Private Key. This key will be used to open the file." HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS"/>
+        <Label x:Name="Title_Copy" Content="This key should follow the normal file key format." HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS"/>
+        <TextBox x:Name="FileKeyField" HorizontalAlignment="Left" Height="120" Margin="10,91,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="374"/>
+        <Button x:Name="SubmitButton" Content="Submit" HorizontalAlignment="Left" Margin="303,63,0,0" VerticalAlignment="Top" Width="81" Height="25" FontFamily="Trebuchet MS" FontSize="14" Click="Button_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button x:Name="Generate_Secure_Key" Content="Generate Secure Key" HorizontalAlignment="Left" Margin="130,63,0,0" VerticalAlignment="Top" Width="160" Height="25" FontFamily="Trebuchet MS" FontSize="14" Click="Generate_Secure_Key_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+
+    </Grid>
+</Window>

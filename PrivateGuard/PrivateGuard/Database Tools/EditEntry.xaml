@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrivateGuard.Database_Tools"
         mc:Ignorable="d"
-        Title="EditEntry" Height="360" Width="425" Icon="Key_16x.png">
+        Title="EditEntry" Height="360" Width="425" Icon="Key_16x.png" ResizeMode="CanMinimize">
     <Grid Background="#FFCBCBCB">
         <Label x:Name="EditTitle" Content="Editing Entry" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold" FontStyle="Italic"/>
         <Label x:Name="UsernameLabel" Content="Username" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14"/>

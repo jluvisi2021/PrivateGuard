@@ -108,6 +108,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Database Tools\SaveAsNewKey.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -127,6 +131,9 @@
     </Compile>
     <Compile Include="Database Tools\PasswordGen.xaml.cs">
       <DependentUpon>PasswordGen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database Tools\SaveAsNewKey.xaml.cs">
+      <DependentUpon>SaveAsNewKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -242,6 +249,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Message_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Copy_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SaveAs_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

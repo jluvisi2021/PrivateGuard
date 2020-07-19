@@ -22,6 +22,11 @@
                         <Image Source="/Resources/Save_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem x:Name="SaveAsItem" Header="Save As" InputGestureText="" Click="SaveAsItem_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/SaveAs_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem x:Name="ExportAsTextItem" Header="Export as Text" InputGestureText="Ctrl+T" Click="ExportAsTextItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/ExportFile_16x.png" />
@@ -149,7 +154,32 @@
             </MenuItem>
         </Menu>
         <Label x:Name="EditingLabel" Grid.ColumnSpan="2" Content="Editing: " HorizontalAlignment="Left" Margin="203.333,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="329" Grid.Column="1"/>
-        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="384" Margin="9.333,56,-158,0" VerticalAlignment="Top" Width="750" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single">
+        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="403" Margin="9,37,-157,0" VerticalAlignment="Top" Width="750" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="EditEntry" Header="Edit" Click="EditEntry_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/ASX_Edit_blue_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="RemoveEntry" Header="Remove" Click="RemoveEntry_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Close_red_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="CopyUsername" Header="Copy Username" Click="CopyUsername_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Copy_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="Copy_Password" Header="Copy Password" Click="Copy_Password_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Copy_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
+        <Label x:Name="AutoSaveLabel" Content="" Grid.Column="2" HorizontalAlignment="Left" Margin="256,30,-157,0" VerticalAlignment="Top" Width="203"/>
     </Grid>
 </Window>
