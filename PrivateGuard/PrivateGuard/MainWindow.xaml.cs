@@ -19,7 +19,7 @@ namespace PrivateGuard
         private readonly string username = "jluvisi";
 
         bool ShowFileKeyField = false;
-        public static float VersionID = 0.4F;
+        public static float VersionID = 1.0F;
         public static readonly string SETTINGS_DIR = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
 
 
@@ -45,7 +45,8 @@ namespace PrivateGuard
                     "Created On: " + DateTime.Now.ToString(),
                     "",
                     "IDLE_TIMER: Enabled",
-                    "GLOBAL_FONT: Trebuchet MS"
+                    "GLOBAL_FONT: Trebuchet MS",
+                    "FONT_SIZE: 12px"
                 };
                 File.WriteAllLines(appdata + "\\PrivateGuard\\settings.bin", testing);
                 Console.WriteLine("Creating settings file.");
@@ -181,11 +182,11 @@ namespace PrivateGuard
             Database db;
             if (ShowFileKeyField)
             {
-                db = new Database(a, ViewPasswordTextBox.Text);
+                db = new Database(a, _Checkable);
             }
             else
             {
-                db = new Database(a, FileKeyField.Password.ToString());
+                db = new Database(a, _Checkable);
             }
 
             db.Show();

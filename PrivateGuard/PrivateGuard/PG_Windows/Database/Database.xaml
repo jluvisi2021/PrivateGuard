@@ -71,6 +71,18 @@
 
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem x:Name="HelpItem" Header="Help (Github Wiki)" InputGestureText="" Click="HelpItem_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Question_16x.png" />
+
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="ContactDevItem" Header="Contact Developer" InputGestureText="" Click="ContactDevItem_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Message_16x.png" />
+
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem x:Name="SettingsMenuItem" Header="Settings" Height="28" Width="62" FontWeight="Bold">
                 <MenuItem x:Name="DisableIdleTimerItem" Header="Disable Idle Timer" InputGestureText="CTRL+P" Click="DisableIdleTimerItem_Click">
@@ -109,9 +121,35 @@
                     </MenuItem>
 
                 </MenuItem>
+                <MenuItem x:Name="TextSizeItem" Header="Font Size" InputGestureText="CTRL+(+/-)">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/FontSize_16x.png" />
+                    </MenuItem.Icon>
+                    <MenuItem x:Name="TextSize8PXItem" Header="8px (Small)" IsCheckable="True" StaysOpenOnClick="True" Click="TextSize8PXItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/FontSize_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="TextSize12PXItem" Header="12px (Default)" IsCheckable="True" StaysOpenOnClick="True" Click="TextSize12PXItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/FontSize_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="TextSize16PXItem" Header="16px (Large)" IsCheckable="True" StaysOpenOnClick="True" Click="TextSize16PXItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/FontSize_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="TextSize20PXItem" Header="20px (Very Large)" IsCheckable="True" StaysOpenOnClick="True" Click="TextSize20PXItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/FontSize_16x.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <Label x:Name="EditingLabel" Grid.ColumnSpan="2" Content="Editing: " HorizontalAlignment="Left" Margin="203.333,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="329" Grid.Column="1"/>
-        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="384" Margin="9.333,56,-158,0" VerticalAlignment="Top" Width="750" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1"/>
+        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="384" Margin="9.333,56,-158,0" VerticalAlignment="Top" Width="750" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single">
+        </DataGrid>
     </Grid>
 </Window>

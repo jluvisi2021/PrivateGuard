@@ -28,27 +28,31 @@ namespace PrivateGuard.PG_Windows
         int SelectedEntry = -1;
         private string Filename { get; set; }
         private readonly int CheckInterval = 60 * 1000;
-        private readonly string PrivateKey;
+        private string PrivateKey = "GAYLORD123";
         private bool IsIdleTimerEnabled = true;
         private readonly CancellationTokenSource token = new CancellationTokenSource();
         private readonly double[] MousePosition = new double[2];
         private readonly double[] MousePositionOld = { 0.0, 0.0 };
         private Timer _timer;
+        private Timer _autosavetimer;
         public Database(string filename, string privatekey)
         {
 
             InitializeComponent();
             this.Filename = filename;
-
+            this.PrivateKey = privatekey;
             EditingLabel.Content = "Editing: " + this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1];
+            
             SetupDataGrid();
-            PrivateKey = privatekey;
+
             // Run Idle Timer.
             ManageIdle();
             string Raw_Settings = File.ReadAllText(MainWindow.SETTINGS_DIR);
             // Change the global font.
             GetSettingsFont(Raw_Settings);
+            GetSettingsFontSize();
             SetIdleTimerValue();
+           
         }
 
         public void SetIdleTimerValue()
@@ -62,6 +66,40 @@ namespace PrivateGuard.PG_Windows
                 IsIdleTimerEnabled = false;
                 DisableIdleTimerItem.Header = "Enable Idle Timer";
 
+            }
+        }
+
+        /// <summary>
+        /// Reads the Font Size from Settings.bin.
+        /// The font size is located on the 6th line of the file.
+        /// </summary>
+        public void GetSettingsFontSize()
+        {
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            if(b[5].Contains("8px"))
+            {
+                PasswordDB.FontSize = 8;
+                TextSize8PXItem.IsChecked = true;
+            }else if(b[5].Contains("12px"))
+            {
+                PasswordDB.FontSize = 12;
+                TextSize12PXItem.IsChecked = true;
+            }
+            else if(b[5].Contains("16px"))
+            {
+                PasswordDB.FontSize = 16;
+                TextSize16PXItem.IsChecked = true;
+            }
+            else if(b[5].Contains("20px"))
+            {
+                PasswordDB.FontSize = 20;
+                TextSize20PXItem.IsChecked = true;
+            }
+            else
+            {
+                MessageBox.Show("Could not read font size from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                PasswordDB.FontSize = 12;
             }
         }
 
@@ -94,7 +132,7 @@ namespace PrivateGuard.PG_Windows
             }
             else
             {
-                MessageBox.Show("Could not read font from settings file.\nIf you continue to get this error then try running the program as administrator.", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Could not read font type from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 ChangeGlobalFont("Trebuchet MS");
                 SubFontTrebuchetMSItem.IsChecked = true;
             }
@@ -103,6 +141,10 @@ namespace PrivateGuard.PG_Windows
         public void ManageIdle()
         {
             _timer = new Timer(Tick, null, CheckInterval, Timeout.Infinite);
+        }
+        public void ManageAutoSave()
+        {
+
         }
 
         private void Tick(object state)
@@ -204,11 +246,11 @@ namespace PrivateGuard.PG_Windows
             for (int i = 0; i < SeperateObjectValues.Count; i += 5)
             {
 
-                string ID = SeperateObjectValues[i].Substring(0, SeperateObjectValues[i].Length - 1);
-                string Username = SeperateObjectValues[i + 1];
-                string Password = SeperateObjectValues[i + 2];
-                string Date = SeperateObjectValues[i + 3];
-                string Notes = SeperateObjectValues[i + 4];
+                string ID = Cipher.Decrypt(SeperateObjectValues[i].Substring(0, SeperateObjectValues[i].Length - 1), PrivateKey);
+                string Username = Cipher.Decrypt(SeperateObjectValues[i + 1], PrivateKey);
+                string Password = Cipher.Decrypt(SeperateObjectValues[i + 2], PrivateKey);
+                string Date = Cipher.Decrypt(SeperateObjectValues[i + 3], PrivateKey);
+                string Notes = Cipher.Decrypt(SeperateObjectValues[i + 4], PrivateKey);
                 EntryObject entry = new EntryObject(int.Parse(ID.Trim()), Username, Password, Date, Notes);
                 PasswordDB.Items.Add(entry);
 
@@ -361,11 +403,7 @@ namespace PrivateGuard.PG_Windows
             EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
             EntryObject copy = (EntryObject)obj.Clone();
             copy.ID = PasswordDB.Items.Count;
-            // Deselect all items.
-            PasswordDB.SelectedItems.Clear();
-            PasswordDB.SelectedCells.Clear();
             PasswordDB.Items.Add(copy);
-            SelectedEntry = -1;
         }
 
         private void DeleteAllEntriesItem_Click(object sender, RoutedEventArgs e)
@@ -562,6 +600,7 @@ namespace PrivateGuard.PG_Windows
 
         private void SubFontTimesNewRomanItem_Click(object sender, RoutedEventArgs e)
         {
+            SubFontTimesNewRomanItem.IsChecked = true;
             SubFontArialItem.IsChecked = false;
             SubFontTrebuchetMSItem.IsChecked = false;
             SubFontCourierItem.IsChecked = false;
@@ -580,6 +619,7 @@ namespace PrivateGuard.PG_Windows
 
         private void SubFontArialItem_Click(object sender, RoutedEventArgs e)
         {
+            SubFontArialItem.IsChecked = true;
             SubFontTimesNewRomanItem.IsChecked = false;
             SubFontTrebuchetMSItem.IsChecked = false;
             SubFontCourierItem.IsChecked = false;
@@ -598,6 +638,7 @@ namespace PrivateGuard.PG_Windows
 
         private void SubFontTrebuchetMSItem_Click(object sender, RoutedEventArgs e)
         {
+            SubFontTrebuchetMSItem.IsChecked = true;
             SubFontArialItem.IsChecked = false;
             SubFontTimesNewRomanItem.IsChecked = false;
             SubFontCourierItem.IsChecked = false;
@@ -616,6 +657,8 @@ namespace PrivateGuard.PG_Windows
 
         private void SubFontCourierItem_Click(object sender, RoutedEventArgs e)
         {
+
+            SubFontCourierItem.IsChecked = true;
             SubFontArialItem.IsChecked = false;
             SubFontTrebuchetMSItem.IsChecked = false;
             SubFontTimesNewRomanItem.IsChecked = false;
@@ -648,6 +691,90 @@ namespace PrivateGuard.PG_Windows
                 NewText += s + Environment.NewLine;
             }
             File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+        }
+
+        private void TextSize8PXItem_Click(object sender, RoutedEventArgs e)
+        {
+            TextSize8PXItem.IsChecked = true;
+            PasswordDB.FontSize = 8;
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[5] = "FONT_SIZE: 8px";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            TextSize12PXItem.IsChecked = false;
+            TextSize16PXItem.IsChecked = false;
+            TextSize20PXItem.IsChecked = false;
+        }
+
+        private void TextSize12PXItem_Click(object sender, RoutedEventArgs e)
+        {
+            TextSize12PXItem.IsChecked = true;
+            PasswordDB.FontSize = 12;
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[5] = "FONT_SIZE: 12px";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            TextSize8PXItem.IsChecked = false;
+            TextSize16PXItem.IsChecked = false;
+            TextSize20PXItem.IsChecked = false;
+        }
+
+        private void TextSize16PXItem_Click(object sender, RoutedEventArgs e)
+        {
+            TextSize16PXItem.IsChecked = true;
+            PasswordDB.FontSize = 16;
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[5] = "FONT_SIZE: 16px";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            TextSize8PXItem.IsChecked = false;
+            TextSize12PXItem.IsChecked = false;
+            TextSize20PXItem.IsChecked = false;
+        }
+
+        private void TextSize20PXItem_Click(object sender, RoutedEventArgs e)
+        {
+            TextSize20PXItem.IsChecked = true;
+            PasswordDB.FontSize = 20;
+            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            b[5] = "FONT_SIZE: 20px";
+            string NewText = string.Empty;
+            foreach (string s in b)
+            {
+                NewText += s + Environment.NewLine;
+            }
+            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            TextSize8PXItem.IsChecked = false;
+            TextSize16PXItem.IsChecked = false;
+            TextSize12PXItem.IsChecked = false;
+        }
+
+        private void HelpItem_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/jluvisi2021/PrivateGuard/wiki");
+        
+        }
+
+        private void ContactDevItem_Click(object sender, RoutedEventArgs e)
+        {
+            Contact c = new Contact();
+            c.ShowDialog();
         }
     }
     public class EntryObject : ICloneable
