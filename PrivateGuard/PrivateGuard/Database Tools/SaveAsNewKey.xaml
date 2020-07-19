@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrivateGuard.Database_Tools"
         mc:Ignorable="d"
-        Title="SaveAsNewKey" Height="250" Width="400" ResizeMode="CanMinimize">
+        Title="SaveAsNewKey" Height="260" Width="410" ResizeMode="CanMinimize" Icon="PG_Shield_t.png">
     <Grid>
         <Label x:Name="Title" Content="Enter the new Private Key. This key will be used to open the file." HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS"/>
         <Label x:Name="Title_Copy" Content="This key should follow the normal file key format." HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS"/>

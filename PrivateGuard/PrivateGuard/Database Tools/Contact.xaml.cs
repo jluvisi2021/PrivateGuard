@@ -40,7 +40,7 @@ namespace PrivateGuard.Database_Tools
                 client.Timeout = 10000;
                 client.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new System.Net.NetworkCredential("privateguardcustomer@gmail.com", "(PASSWORD)");
+                client.Credentials = new System.Net.NetworkCredential("privateguardcustomer@gmail.com", "privateguard123");
                 System.Net.Mail.MailMessage mm = new System.Net.Mail.MailMessage("privateguardcustomer@gmail.com", "jprivateguard@gmail.com", "Private Guard Customer Issue", $"Name:{NameField.Text} / Issue: {ProblemTextBox.Text}");
                 mm.BodyEncoding = UTF8Encoding.UTF8;
                 mm.DeliveryNotificationOptions = System.Net.Mail.DeliveryNotificationOptions.OnFailure;

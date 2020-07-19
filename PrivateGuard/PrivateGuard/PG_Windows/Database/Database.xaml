@@ -95,7 +95,7 @@
                         <Image Source="/Resources/Timer_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="FontItem" Header="Font" InputGestureText="CTRL+F">
+                <MenuItem x:Name="FontItem" Header="Font" InputGestureText="">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Font_16x.png" />
                     </MenuItem.Icon>

@@ -19,7 +19,7 @@ namespace PrivateGuard
         private readonly string username = "jluvisi";
 
         bool ShowFileKeyField = false;
-        public static float VersionID = 1.0F;
+        public static string VersionID = "1.0.1";
         public static readonly string SETTINGS_DIR = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
 
 
@@ -188,7 +188,10 @@ namespace PrivateGuard
             {
                 db = new Database(a, _Checkable);
             }
-
+            if(new FileInfo(SelectedFileField.Text).Length > 100000)
+            {
+                MessageBox.Show("Your file has exceeded the reccomended file size limit (100KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!", "File Size Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
             db.Show();
             Close();
             // All is good attempt to open file.

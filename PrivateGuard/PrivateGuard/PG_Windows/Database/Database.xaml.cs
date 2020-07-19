@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -28,8 +29,7 @@ namespace PrivateGuard.PG_Windows
         int SelectedEntry = -1;
         private string Filename { get; set; }
         private readonly int CheckInterval = 60 * 1000;
-        private int SecondCount = 0;
-        private string PrivateKey = "GAYLORD123";
+        private readonly string PrivateKey;
         private bool IsIdleTimerEnabled = true;
         private readonly CancellationTokenSource token = new CancellationTokenSource();
         private readonly double[] MousePosition = new double[2];
@@ -44,25 +44,95 @@ namespace PrivateGuard.PG_Windows
             EditingLabel.Content = "Editing: " + this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1];
 
             SetupDataGrid();
-            string Raw_Settings = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            // Change the global font.
-            GetSettingsFont(Raw_Settings);
+            GetSettingsFont(File.ReadAllText(MainWindow.SETTINGS_DIR));
             GetSettingsFontSize();
             SetIdleTimerValue();
-
+            SetupInputBindings();
         }
 
         public void SetIdleTimerValue()
         {
+           
             // Idle timer is on.
             String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
             string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            
             if (!b[3].Contains("Enabled"))
             {
                 // Idle timer off.
                 IsIdleTimerEnabled = false;
                 DisableIdleTimerItem.Header = "Enable Idle Timer";
 
+            }
+        }
+        /// <summary>
+        /// Setup keyboard short cuts for each Item Menu
+        /// </summary>
+        public void SetupInputBindings()
+        {
+            RoutedCommand ExportAsText = new RoutedCommand();
+            ExportAsText.InputGestures.Add(new KeyGesture(Key.T, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(ExportAsText, ExportAsTextItem_Click));
+
+            RoutedCommand Save = new RoutedCommand();
+            Save.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(Save, SaveItem_Click));
+
+            RoutedCommand AddEntry = new RoutedCommand();
+            AddEntry.InputGestures.Add(new KeyGesture(Key.E, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(AddEntry, AddEntryItem_Click));
+
+            RoutedCommand RemoveEntry = new RoutedCommand();
+            RemoveEntry.InputGestures.Add(new KeyGesture(Key.X, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(RemoveEntry, RemoveEntryItem_Click));
+
+            RoutedCommand EditEntry = new RoutedCommand();
+            EditEntry.InputGestures.Add(new KeyGesture(Key.W, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(EditEntry, EditEntryItem_Click));
+
+            RoutedCommand DuplicateEntry = new RoutedCommand();
+            DuplicateEntry.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(DuplicateEntry, DuplicateEntryItem_Click));
+
+            RoutedCommand DisableIdleTimer = new RoutedCommand();
+            DisableIdleTimer.InputGestures.Add(new KeyGesture(Key.P, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(DisableIdleTimer, DisableIdleTimerItem_Click));
+
+        }
+
+        public void IncreaseFont(int currsize)
+        {
+            if(currsize == 8)
+            {
+                PasswordDB.FontSize = 12;
+                TextSize12PXItem_Click(this, null);
+            }else if(currsize == 12)
+            {
+                PasswordDB.FontSize = 16;
+                TextSize16PXItem_Click(this, null);
+            }
+            else if(currsize == 16)
+            {
+                PasswordDB.FontSize = 20;
+                TextSize20PXItem_Click(this, null);
+            }
+        }
+        public void DecreaseFont(int currsize)
+        {
+            if (currsize == 20)
+            {
+                PasswordDB.FontSize = 16;
+                TextSize16PXItem_Click(this, null);
+            }
+            else if (currsize == 16)
+            {
+                PasswordDB.FontSize = 12;
+                TextSize12PXItem_Click(this, null);
+            }
+            else if (currsize == 12)
+            {
+                PasswordDB.FontSize = 8;
+                TextSize8PXItem_Click(this, null);
             }
         }
 
@@ -232,6 +302,8 @@ namespace PrivateGuard.PG_Windows
             }
 
             SeperateObjectValues.RemoveAt(0); // Remove the header.
+
+
 
             for (int i = 0; i < SeperateObjectValues.Count; i += 5)
             {
@@ -437,7 +509,6 @@ namespace PrivateGuard.PG_Windows
             MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             return;
         }
-
         private void ExitItem_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Return to Main Menu?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
@@ -482,7 +553,7 @@ namespace PrivateGuard.PG_Windows
                     a.Add("Exported on: " + DateTime.Now.ToString());
                     a.Add("File Key: " + PrivateKey);
                     double length = new FileInfo(Filename).Length;
-                    a.Add("Database Size: " + length / 1000 + " MB");
+                    a.Add("Database Size: " + length / 1000 + " KB");
                     a.Add("<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->");
                     a.Add(""); // Add new line
                     for (int i = 0; i < PasswordDB.Items.Count; i++)
@@ -823,6 +894,10 @@ namespace PrivateGuard.PG_Windows
                 SaveAsNewKey NewKeyWindow = new SaveAsNewKey();
                 NewKeyWindow.ShowDialog();
                 Key1 = NewKeyWindow.NewKey;
+                if(string.IsNullOrWhiteSpace(Key1))
+                {
+                    return;
+                }
             }
 
 
@@ -841,7 +916,6 @@ namespace PrivateGuard.PG_Windows
             {
                 if ((myStream = sfd.OpenFile()) != null)
                 {
-                    MessageBox.Show($"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.", "Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
                     myStream.Close();
 
                     File.WriteAllText(sfd.FileName, String.Empty);
@@ -865,12 +939,32 @@ namespace PrivateGuard.PG_Windows
                         bw.Write(Cipher.Encrypt(temp.Notes, Key1));
                         bw.Write(Environment.NewLine);
                     }
+                    MessageBox.Show($"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.", "Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
+
                     bw.Close();
                     fs.Close();
 
                     // Code to write the stream goes here.
 
 
+                }
+            }
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.OemPlus)
+            {
+                if(Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
+                    IncreaseFont((int)PasswordDB.FontSize);
+                }
+            }
+            if(e.Key == Key.OemMinus)
+            {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
+                    DecreaseFont((int)PasswordDB.FontSize);
                 }
             }
         }
