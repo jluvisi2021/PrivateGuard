@@ -1,50 +1,40 @@
-﻿using PrivateGuard.PG_Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using PrivateGuard.PG_Windows;
 
 namespace PrivateGuard.Database_Tools
 {
     /// <summary>
-    /// Interaction logic for AddEntry.xaml
+    ///     Interaction logic for AddEntry.xaml
     /// </summary>
-    public partial class EditEntry : Window
+    public partial class EditEntry
     {
+        public EntryObject Entry { set; get; }
 
 
-        public EntryObject entry { set;  get; }
-
-        
         public EditEntry(EntryObject obj)
         {
             InitializeComponent();
-            
-            entry = obj;
-            UsernameField.Text = entry.Username.ToString();
-            PasswordField.Text = entry.Password.ToString();
-            NotesField.Text = entry.Notes.ToString();
-            EditTitle.Content = "Editing... ID: " + entry.ID;
-            
+
+            Entry = obj;
+            UsernameField.Text = Entry.Username;
+            PasswordField.Text = Entry.Password;
+            NotesField.Text = Entry.Notes;
+            EditTitle.Content = "Editing... ID: " + Entry.ID;
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(UsernameField.Text) || string.IsNullOrEmpty(PasswordField.Text)) {
-                MessageBox.Show("You cannot leave the username field or password field empty!", "Error while saving.", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (string.IsNullOrWhiteSpace(UsernameField.Text) || string.IsNullOrEmpty(PasswordField.Text))
+            {
+                MessageBox.Show("You cannot leave the username field or password field empty!", "Error while saving.",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            EntryObject obj = new EntryObject(entry.ID, UsernameField.Text, PasswordField.Text, DateTime.Today.ToShortDateString(), NotesField.Text);
-            entry = obj;
+
+            var obj = new EntryObject(Entry.ID, UsernameField.Text, PasswordField.Text,
+                DateTime.Today.ToShortDateString(), NotesField.Text);
+            Entry = obj;
             Close();
         }
     }

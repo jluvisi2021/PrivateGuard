@@ -5,16 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrivateGuard.PG_Windows"
         mc:Ignorable="d"
-        Title="Database" Height="450" Width="770" WindowStyle="None" ResizeMode="NoResize" Icon="PG_Shield_t.png">
+        Title="Database" Height="475" Width="800" WindowStyle="None" ResizeMode="NoResize" Icon="PG_Shield_t.png" KeyDown="Window_KeyDown">
     <Grid Background="#FFA8A3A3" MouseMove="Grid_MouseMove">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="299"/>
-            <ColumnDefinition Width="301"/>
+            <ColumnDefinition x:Name="bitch" Width="301"/>
         </Grid.ColumnDefinitions>
         <Rectangle Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="823" Fill="#FF434351" MouseDown="Rectangle_MouseDown" Margin="0,0,-220,0"/>
-        <Label x:Name="ExitProgramLabel" Content="X" Margin="434,-9,-168,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="30" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
-        <Label x:Name="MinimizeProgramLabel" Content="_" Margin="394,-29,-127,0" VerticalAlignment="Top" Height="57" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave" Grid.Column="2"/>
+        <Label x:Name="ExitProgramLabel" Content="X" Margin="464,-9,-198,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="30" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
+        <Label x:Name="MinimizeProgramLabel" Content="_" Margin="429,-29,-162,0" VerticalAlignment="Top" Height="57" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave" Grid.Column="2"/>
         <Menu x:Name="MenuBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="199" Background="#FF565664" FontFamily="Trebuchet MS" FontWeight="Bold" MouseDown="Menu_MouseDown">
             <MenuItem x:Name="FileMenuItem" Header="File" Height="28" Width="36" FontWeight="Bold">
                 <MenuItem x:Name="SaveItem" Header="Save" InputGestureText="Ctrl+S" Click="SaveItem_Click">
@@ -154,7 +154,7 @@
             </MenuItem>
         </Menu>
         <Label x:Name="EditingLabel" Grid.ColumnSpan="2" Content="Editing: " HorizontalAlignment="Left" Margin="203.333,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="329" Grid.Column="1"/>
-        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="403" Margin="9,37,-157,0" VerticalAlignment="Top" Width="750" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single">
+        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="428" Margin="9,37,-187,0" VerticalAlignment="Top" Width="780" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem x:Name="EditEntry" Header="Edit" Click="EditEntry_Click">

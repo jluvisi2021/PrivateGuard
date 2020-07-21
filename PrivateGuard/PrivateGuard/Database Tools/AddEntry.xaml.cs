@@ -1,44 +1,36 @@
 ﻿using PrivateGuard.PG_Windows;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PrivateGuard.Database_Tools
 {
     /// <summary>
-    /// Interaction logic for AddEntry.xaml
+    ///     Interaction logic for AddEntry.xaml
     /// </summary>
-    public partial class AddEntry : Window
+    public partial class AddEntry
     {
+        public EntryObject NewEntryObject { set; get; }
 
+        private readonly int _rowCount;
 
-        public EntryObject entry { set;  get; }
-
-        readonly int rowcount;
-        public AddEntry(int rowcount)
+        public AddEntry(int rowCount)
         {
-            this.rowcount = rowcount;
+            _rowCount = rowCount;
             InitializeComponent();
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-           if(string.IsNullOrWhiteSpace(UsernameField.Text) || string.IsNullOrEmpty(PasswordField.Text)) {
-                MessageBox.Show("You cannot leave the username field or password field empty!", "Error while saving.", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (string.IsNullOrWhiteSpace(UsernameField.Text) || string.IsNullOrEmpty(PasswordField.Text))
+            {
+                MessageBox.Show("You cannot leave the username field or password field empty!", "Error while saving.",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            EntryObject obj = new EntryObject(rowcount, UsernameField.Text, PasswordField.Text, DateTime.Today.ToShortDateString(), NotesField.Text);
-            entry = obj;
+
+            var obj = new EntryObject(_rowCount, UsernameField.Text, PasswordField.Text,
+                DateTime.Today.ToShortDateString(), NotesField.Text);
+            NewEntryObject = obj;
             Close();
         }
     }

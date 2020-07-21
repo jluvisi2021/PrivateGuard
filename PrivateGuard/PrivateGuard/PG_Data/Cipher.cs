@@ -9,6 +9,17 @@ namespace PrivateGuard.PG_Data
 {
     class Cipher
     {
+        /*
+        public static string Encrypt(string plainText, string passPhrase)
+        {
+            return plainText;
+        }
+        public static string Decrypt(string cipherText, string passPhrase)
+        {
+            return cipherText;
+        }
+        */
+
 
         // This constant is used to determine the keysize of the encryption algorithm in bits.
         // We divide this by 8 within the code below to get the equivalent number of bytes.
@@ -104,5 +115,6 @@ namespace PrivateGuard.PG_Data
             }
             return randomBytes;
         }
-    }
+            
+        }
 }

@@ -8,6 +8,5 @@ namespace PrivateGuard
     
     public partial class App : Application
     {
-        public static string Font = "Trebuchet MS";
     }
 }

@@ -10,30 +10,13 @@
         <Label x:Name="ContactTitle" Content="Contact Developer (Help)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="32" Width="216" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,33,0,0" TextWrapping="Wrap" Text="NOTE: Before using this method please make sure you have read the Q&amp;A and watched the Private Guard tutorial. (See Utilities -&gt; Help on the database page)" VerticalAlignment="Top" Height="24" Width="458" FontSize="10" FontStyle="Italic"/>
         <Separator HorizontalAlignment="Left" Height="18" Margin="10,62,0,0" VerticalAlignment="Top" Width="474"/>
-        <Label x:Name="NameLabel" Content="Name:" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top"/>
-        <Label Content="Your Problem:" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="ProblemTextBox" HorizontalAlignment="Left" Height="174" Margin="10,137,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="474">
-            <TextBox.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="3"/>
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
-        <Label Content="(Remember to be as descriptive as possible)" HorizontalAlignment="Left" Margin="108,111,0,0" VerticalAlignment="Top" FontStyle="Italic"/>
-        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="409,111,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="SendButton_Click">
+        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="409,301,0,0" VerticalAlignment="Top" Width="75" Height="20">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <TextBox x:Name="NameField" HorizontalAlignment="Left" Height="23" Margin="61,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120">
-            <TextBox.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="3"/>
-                </Style>
-            </TextBox.Resources>
-        </TextBox>
 
     </Grid>
 </Window>

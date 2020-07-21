@@ -1,18 +1,19 @@
-﻿using Microsoft.Win32;
-using PrivateGuard.Database_Tools;
-using PrivateGuard.PG_Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.Win32;
+using PrivateGuard.Database_Tools;
+using PrivateGuard.PG_Data;
+using Exception = System.Exception;
 
 namespace PrivateGuard.PG_Windows
 {
@@ -23,116 +24,139 @@ namespace PrivateGuard.PG_Windows
 
     //TODO: Have trebuchet checked in fonts by default.
     // dont allow users to select more than one font.
-    public partial class Database : Window
+    public partial class Database
     {
+        private int _selectedEntry = -1;
+        private string Filename { get; }
+        private const int CheckInterval = 60 * 1000;
+        private readonly string _privateKey;
+        private bool _isIdleTimerEnabled = true;
+        private readonly CancellationTokenSource _token = new CancellationTokenSource();
+        private readonly double[] _mousePosition = new double[2];
+        private readonly double[] _mousePositionOld = { 0.0, 0.0 };
+        private readonly Timer _timer;
 
-        int SelectedEntry = -1;
-        private string Filename { get; set; }
-        private readonly int CheckInterval = 60 * 1000;
-        private readonly string PrivateKey;
-        private bool IsIdleTimerEnabled = true;
-        private readonly CancellationTokenSource token = new CancellationTokenSource();
-        private readonly double[] MousePosition = new double[2];
-        private readonly double[] MousePositionOld = { 0.0, 0.0 };
-        private Timer _timer;
-        public Database(string filename, string privatekey)
+        public Database(string filename, string privateKey)
         {
-
             InitializeComponent();
-            this.Filename = filename;
-            this.PrivateKey = privatekey;
-            EditingLabel.Content = "Editing: " + this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1];
+            Filename = filename;
+            _privateKey = privateKey;
+            EditingLabel.Content = "Editing: " + Filename.Trim().Split('\\')[Filename.Trim().Split('\\').Length - 1];
 
             SetupDataGrid();
             GetSettingsFont(File.ReadAllText(MainWindow.SETTINGS_DIR));
             GetSettingsFontSize();
             SetIdleTimerValue();
             SetupInputBindings();
+            _timer = new Timer(Tick, null, 5000, Timeout.Infinite);
         }
 
+        /// <summary>
+        /// Reads the settings file and determines if the
+        /// database should be using the idle timer.
+        /// </summary>
         public void SetIdleTimerValue()
         {
-           
             // Idle timer is on.
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            
-            if (!b[3].Contains("Enabled"))
-            {
-                // Idle timer off.
-                IsIdleTimerEnabled = false;
-                DisableIdleTimerItem.Header = "Enable Idle Timer";
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var rawSettingsData = data.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
 
+            if (rawSettingsData[3].Contains("Enabled"))
+            {
+                return;
             }
+            // Idle Timer not in Settings.bin file. We can indicate the user has turned it off.
+            _isIdleTimerEnabled = false;
+            DisableIdleTimerItem.Header = "Enable Idle Timer";
         }
+
         /// <summary>
         /// Setup keyboard short cuts for each Item Menu
         /// </summary>
         public void SetupInputBindings()
         {
-            RoutedCommand ExportAsText = new RoutedCommand();
-            ExportAsText.InputGestures.Add(new KeyGesture(Key.T, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(ExportAsText, ExportAsTextItem_Click));
+            var exportAsText = new RoutedCommand();
+            exportAsText.InputGestures.Add(new KeyGesture(Key.T, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(exportAsText, ExportAsTextItem_Click));
 
-            RoutedCommand Save = new RoutedCommand();
-            Save.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(Save, SaveItem_Click));
+            var save = new RoutedCommand();
+            save.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(save, SaveItem_Click));
 
-            RoutedCommand AddEntry = new RoutedCommand();
-            AddEntry.InputGestures.Add(new KeyGesture(Key.E, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(AddEntry, AddEntryItem_Click));
+            var addEntry = new RoutedCommand();
+            addEntry.InputGestures.Add(new KeyGesture(Key.E, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(addEntry, AddEntryItem_Click));
 
-            RoutedCommand RemoveEntry = new RoutedCommand();
-            RemoveEntry.InputGestures.Add(new KeyGesture(Key.X, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(RemoveEntry, RemoveEntryItem_Click));
+            var removeEntry = new RoutedCommand();
+            removeEntry.InputGestures.Add(new KeyGesture(Key.X, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(removeEntry, RemoveEntryItem_Click));
 
-            RoutedCommand EditEntry = new RoutedCommand();
-            EditEntry.InputGestures.Add(new KeyGesture(Key.W, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(EditEntry, EditEntryItem_Click));
+            var editEntry = new RoutedCommand();
+            editEntry.InputGestures.Add(new KeyGesture(Key.W, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(editEntry, EditEntryItem_Click));
 
-            RoutedCommand DuplicateEntry = new RoutedCommand();
-            DuplicateEntry.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(DuplicateEntry, DuplicateEntryItem_Click));
+            var duplicateEntry = new RoutedCommand();
+            duplicateEntry.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(duplicateEntry, DuplicateEntryItem_Click));
 
-            RoutedCommand DisableIdleTimer = new RoutedCommand();
-            DisableIdleTimer.InputGestures.Add(new KeyGesture(Key.P, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(DisableIdleTimer, DisableIdleTimerItem_Click));
-
+            var disableIdleTimer = new RoutedCommand();
+            disableIdleTimer.InputGestures.Add(new KeyGesture(Key.P, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(disableIdleTimer, DisableIdleTimerItem_Click));
         }
 
-        public void IncreaseFont(int currsize)
+        /// <summary>
+        /// Increases the font of the program depending on the current font size
+        /// that the program is using.
+        ///
+        /// Depends on the usage of specific button functions to operate.
+        ///
+        /// Method bound to CTRL+(+)
+        /// </summary>
+        /// <param name="currentFontSize"></param>
+        public void IncreaseFont(int currentFontSize)
         {
-            if(currsize == 8)
+            switch (currentFontSize)
             {
-                PasswordDB.FontSize = 12;
-                TextSize12PXItem_Click(this, null);
-            }else if(currsize == 12)
-            {
-                PasswordDB.FontSize = 16;
-                TextSize16PXItem_Click(this, null);
-            }
-            else if(currsize == 16)
-            {
-                PasswordDB.FontSize = 20;
-                TextSize20PXItem_Click(this, null);
+                case 8:
+                    PasswordDB.FontSize = 12;
+                    TextSize12PXItem_Click(this, null);
+                    break;
+                case 12:
+                    PasswordDB.FontSize = 16;
+                    TextSize16PXItem_Click(this, null);
+                    break;
+                case 16:
+                    PasswordDB.FontSize = 16;
+                    TextSize16PXItem_Click(this, null);
+                    break;
             }
         }
-        public void DecreaseFont(int currsize)
+
+        /// <summary>
+        /// Decreases the font of the program depending on the current font size
+        /// that the program is using.
+        ///
+        /// Depends on the usage of specific button functions to operate.
+        ///
+        /// Method bound to CTRL+(-)
+        /// </summary>
+        /// <param name="currentFontSize"></param>
+        public void DecreaseFont(int currentFontSize)
         {
-            if (currsize == 20)
+            switch (currentFontSize)
             {
-                PasswordDB.FontSize = 16;
-                TextSize16PXItem_Click(this, null);
-            }
-            else if (currsize == 16)
-            {
-                PasswordDB.FontSize = 12;
-                TextSize12PXItem_Click(this, null);
-            }
-            else if (currsize == 12)
-            {
-                PasswordDB.FontSize = 8;
-                TextSize8PXItem_Click(this, null);
+                case 20:
+                    PasswordDB.FontSize = 16;
+                    TextSize16PXItem_Click(this, null);
+                    break;
+                case 16:
+                    PasswordDB.FontSize = 12;
+                    TextSize12PXItem_Click(this, null);
+                    break;
+                case 12:
+                    PasswordDB.FontSize = 8;
+                    TextSize8PXItem_Click(this, null);
+                    break;
             }
         }
 
@@ -142,31 +166,33 @@ namespace PrivateGuard.PG_Windows
         /// </summary>
         public void GetSettingsFontSize()
         {
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            if (b[5].Contains("8px"))
+            var settingsFileData = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var settingsFileSplit = settingsFileData.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            if (settingsFileSplit[5].Contains("8px"))
             {
                 PasswordDB.FontSize = 8;
                 TextSize8PXItem.IsChecked = true;
             }
-            else if (b[5].Contains("12px"))
+            else if (settingsFileSplit[5].Contains("12px"))
             {
                 PasswordDB.FontSize = 12;
                 TextSize12PXItem.IsChecked = true;
             }
-            else if (b[5].Contains("16px"))
+            else if (settingsFileSplit[5].Contains("16px"))
             {
                 PasswordDB.FontSize = 16;
                 TextSize16PXItem.IsChecked = true;
             }
-            else if (b[5].Contains("20px"))
+            else if (settingsFileSplit[5].Contains("20px"))
             {
                 PasswordDB.FontSize = 20;
                 TextSize20PXItem.IsChecked = true;
             }
             else
             {
-                MessageBox.Show("Could not read font size from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Could not read font size from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).",
+                    "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 PasswordDB.FontSize = 12;
             }
         }
@@ -200,7 +226,9 @@ namespace PrivateGuard.PG_Windows
             }
             else
             {
-                MessageBox.Show("Could not read font type from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Could not read font type from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).",
+                    "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 ChangeGlobalFont("Trebuchet MS");
                 SubFontTrebuchetMSItem.IsChecked = true;
             }
@@ -209,314 +237,325 @@ namespace PrivateGuard.PG_Windows
 
         private void Tick(object state)
         {
-
             try
             {
-                if (IsIdleTimerEnabled)
-                {
-                    Console.WriteLine("Checking Mouse Position...");
-                    if (MousePositionOld[0] == MousePosition[0] && MousePositionOld[1] == MousePosition[1])
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            MainWindow mw = new MainWindow();
-                            mw.Show();
-                            Close();
-                        });
+                if (!_isIdleTimerEnabled) return;
 
-                        MessageBox.Show("Idle Timer has expired.\nYou have been returned to the home screen.", "Idle Timer", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
-                    }
-                }
-                else
+                // If the mouse position is not in the exact same spot as the last check...
+                if (!_mousePositionOld[0].Equals(_mousePosition[0]) ||
+                    !_mousePositionOld[1].Equals(_mousePosition[1])) return;
+                // Leave the Database and return to the Main Menu.
+                Dispatcher.Invoke(() =>
                 {
-                    Console.WriteLine("Skipped Mouse Check.");
-                }
+                    var mw = new MainWindow();
+                    mw.Show();
+                    Close();
+                });
+
+                MessageBox.Show("Idle Timer has expired.\nYou have been returned to the home screen.",
+                    "Idle Timer", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    
+                
             }
             finally
             {
                 _timer?.Change(CheckInterval, Timeout.Infinite);
                 Dispatcher.Invoke(() =>
                 {
-                    MousePositionOld[0] = Mouse.GetPosition(this).X;
-                    MousePositionOld[1] = Mouse.GetPosition(this).Y;
+                    _mousePositionOld[0] = Mouse.GetPosition(this).X;
+                    _mousePositionOld[1] = Mouse.GetPosition(this).Y;
                 });
-
             }
         }
 
         public void SetupDataGrid()
         {
+            var textColumn = new DataGridTextColumn
+            {
+                Header = "ID #",
+                Binding = new Binding("ID"),
+                Width = 72
+            };
+            PasswordDB.Columns.Add(textColumn);
 
-            DataGridTextColumn TextColumn = new DataGridTextColumn();
-            TextColumn.Header = "ID #";
-            TextColumn.Binding = new Binding("ID");
-            TextColumn.Width = 72;
-            PasswordDB.Columns.Add(TextColumn);
+            textColumn = new DataGridTextColumn
+            {
+                Header = "Username",
+                Width = 170,
 
-            TextColumn = new DataGridTextColumn();
-            TextColumn.Header = "Username";
-            TextColumn.Width = 170;
+                Binding = new Binding("Username")
+            };
+            PasswordDB.Columns.Add(textColumn);
 
-            TextColumn.Binding = new Binding("Username");
-            PasswordDB.Columns.Add(TextColumn);
+            textColumn = new DataGridTextColumn
+            {
+                Header = "Password",
+                Width = 170,
+                Binding = new Binding("Password")
+            };
+            PasswordDB.Columns.Add(textColumn);
 
-            TextColumn = new DataGridTextColumn();
-            TextColumn.Header = "Password";
-            TextColumn.Width = 170;
-            TextColumn.Binding = new Binding("Password");
-            PasswordDB.Columns.Add(TextColumn);
+            textColumn = new DataGridTextColumn
+            {
+                Header = "Date",
+                Width = 100,
+                Binding = new Binding("Date")
+            };
+            PasswordDB.Columns.Add(textColumn);
 
-            TextColumn = new DataGridTextColumn();
-            TextColumn.Header = "Date";
-            //TextColumn.Width = 170;
-            TextColumn.Width = 100;
-            TextColumn.Binding = new Binding("Date");
-            PasswordDB.Columns.Add(TextColumn);
-
-            TextColumn = new DataGridTextColumn();
-            TextColumn.Header = "Notes";
-            //TextColumn.Width = 170;
-            TextColumn.MaxWidth = 390;
-            TextColumn.Binding = new Binding("Notes");
-            PasswordDB.Columns.Add(TextColumn);
+            textColumn = new DataGridTextColumn
+            {
+                Header = "Notes",
+                MaxWidth = 390,
+                Binding = new Binding("Notes")
+            };
+            PasswordDB.Columns.Add(textColumn);
 
             // Setup a way to decode the values from the .pgm file.
-            byte[] FileBytes = File.ReadAllBytes(Filename);
-            string RawData = Encoding.UTF8.GetString(FileBytes);
+            var fileBytes = File.ReadAllBytes(Filename);
+            var rawData = Encoding.UTF8.GetString(fileBytes);
 
             // Decrypt something
             // Split string on each of its lines.
-            string[] b = RawData.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var cipherRawDataText = rawData.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             // Make it into a list for ease of access.
-            List<string> SeperateObjectValues = new List<string>();
-            foreach (string s in b)
+
+            // Go through the now split array and parse out each of the values.
+            // Use the substring to remove the control characters.
+            for (var i = 1; i < cipherRawDataText.Length; i += 5)
             {
-                if (s.Length == 0)
-                {
+                if (cipherRawDataText[i].Length == 0)
                     break;
-                }
-                //MessageBox.Show("s is: " + s + "\nLength:"+s.Length);
-                string a = s.Substring(1, s.Length - 1);
-                SeperateObjectValues.Add(a);
-            }
-
-            SeperateObjectValues.RemoveAt(0); // Remove the header.
-
-
-
-            for (int i = 0; i < SeperateObjectValues.Count; i += 5)
-            {
-
-                string ID = Cipher.Decrypt(SeperateObjectValues[i].Substring(0, SeperateObjectValues[i].Length - 1), PrivateKey);
-                string Username = Cipher.Decrypt(SeperateObjectValues[i + 1], PrivateKey);
-                string Password = Cipher.Decrypt(SeperateObjectValues[i + 2], PrivateKey);
-                string Date = Cipher.Decrypt(SeperateObjectValues[i + 3], PrivateKey);
-                string Notes = Cipher.Decrypt(SeperateObjectValues[i + 4], PrivateKey);
-                EntryObject entry = new EntryObject(int.Parse(ID.Trim()), Username, Password, Date, Notes);
-                PasswordDB.Items.Add(entry);
-
+                PasswordDB.Items.Add(new EntryObject(
+                    int.Parse(Cipher.Decrypt(cipherRawDataText[i].Substring(1, cipherRawDataText[i].Length - 1), _privateKey).Trim()),
+                    Cipher.Decrypt(cipherRawDataText[i + 1].Substring(1, cipherRawDataText[i + 1].Length - 1), _privateKey),
+                    Cipher.Decrypt(cipherRawDataText[i + 2].Substring(1, cipherRawDataText[i + 2].Length - 1), _privateKey),
+                    Cipher.Decrypt(cipherRawDataText[i + 3].Substring(1, cipherRawDataText[i + 3].Length - 1), _privateKey),
+                    Cipher.Decrypt(cipherRawDataText[i + 4].Substring(1, cipherRawDataText[i + 4].Length - 1), _privateKey)));
             }
         }
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
-            {
-                Close();
-            }
+            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) ==
+                MessageBoxResult.OK) Close();
         }
 
-        private void ExitProgramLabel_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Label ExitLabel = sender as Label;
-            ExitLabel.Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
-        }
+        private void ExitProgramLabel_MouseEnter(object sender, MouseEventArgs e) =>
+            ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
+        
 
-        private void ExitProgramLabel_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Label ExitLabel = sender as Label;
-            ExitLabel.Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
-        }
+        private void ExitProgramLabel_MouseLeave(object sender, MouseEventArgs e) =>
+                ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
 
-        private void MinimizeProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
+        private void MinimizeProgramLabel_MouseDown(object sender, MouseButtonEventArgs e) =>
             WindowState = WindowState.Minimized;
-        }
+        
 
-        private void MinimizeProgramLabel_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Label lbl = sender as Label;
-            lbl.Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
-        }
+        private void MinimizeProgramLabel_MouseEnter(object sender, MouseEventArgs e) =>
+                ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(184, 184, 189));
 
-        private void MinimizeProgramLabel_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Label lbl = sender as Label;
-            lbl.Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
-        }
+        private void MinimizeProgramLabel_MouseLeave(object sender, MouseEventArgs e) =>
+                ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
 
 
-
-        private void Menu_MouseDown(object sender, MouseButtonEventArgs e)
-        {
+        private void Menu_MouseDown(object sender, MouseButtonEventArgs e) =>
             DragMove();
-        }
+        
 
-        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
-        {
+        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e) =>
             DragMove();
-        }
+        
 
-        private void EditingLabel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
+        private void EditingLabel_MouseDown(object sender, MouseButtonEventArgs e) =>
             DragMove();
-        }
+        
 
         private void AddEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                AddEntry Entry = new AddEntry(PasswordDB.Items.Count);
-                Entry.ShowDialog();
-                if (Entry.entry == null)
-                {
-                    return;
-                }
-
-                PasswordDB.Items.Add(Entry.entry);
-
-                //PasswordDB.Items.Refresh();
-            }
-            catch (Exception) { }
+            var addEntryWindow = new AddEntry(PasswordDB.Items.Count);
+                addEntryWindow.ShowDialog();
+                if (addEntryWindow.NewEntryObject == null) return;
+                PasswordDB.Items.Add(addEntryWindow.NewEntryObject);
         }
 
-        private void PasswordDB_BeginningEdit(object sender, DataGridBeginningEditEventArgs e) => e.Cancel = true;
+        private void PasswordDB_BeginningEdit(object sender, DataGridBeginningEditEventArgs e) =>
+            e.Cancel = true;
+        
 
         // Get the ID when the user selects a new row.
         private void PasswordDB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedItem = PasswordDB.SelectedItem as EntryObject;
+            var selectedItem = (EntryObject)PasswordDB.SelectedItem;
             if (selectedItem != null)
-                SelectedEntry = selectedItem.ID;
+                _selectedEntry = selectedItem.ID;
         }
 
+        /// <summary>
+        /// Removes the current entry at "Selected Entry"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry == -1)
+            if (_selectedEntry == -1)
             {
-                MessageBox.Show("Select a row to remove first.", "Error removing entry.", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Select a row to remove first.", "Error removing entry.", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 return;
             }
-            if (MessageBox.Show($"Delete entry at {SelectedEntry}?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+             
+            if (MessageBox.Show($"Delete entry at {_selectedEntry}?\nWARNING: (You cannot undo this once you save)",
+                "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
             {
-                PasswordDB.Items.RemoveAt(SelectedEntry);
+                return;
+            }
+            PasswordDB.Items.RemoveAt(_selectedEntry);
 
-                for (int i = 0; i < PasswordDB.Items.Count; i++)
+            for (var i = 0; i < PasswordDB.Items.Count; i++)
+            {
+                if (!(PasswordDB.Items[i] is EntryObject entry))
                 {
-                    EntryObject obj = PasswordDB.Items[i] as EntryObject;
-                    obj.ID = i;
-                    // Replace the object.
-                    PasswordDB.Items.RemoveAt(i);
-                    PasswordDB.Items.Insert(i, obj);
+                    return;
                 }
-                SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
-                return;
+                entry.ID = i;
+                // Replace the object.
+                PasswordDB.Items.RemoveAt(i);
+                PasswordDB.Items.Insert(i, entry);
             }
+            _selectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
         }
 
         private void EditEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry == -1)
+            if (_selectedEntry == -1)
             {
-                MessageBox.Show("Select a row to edit first.", "Error editing entry.", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Select a row to edit first.", "Error editing entry.", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 return;
             }
-            EntryObject a = PasswordDB.Items[SelectedEntry] as EntryObject;
-            EditEntry Entry = new EditEntry(a);
-            Entry.ShowDialog();
-            if (Entry.entry == null)
-            {
-                return;
-            }
-            PasswordDB.Items.RemoveAt(Entry.entry.ID);
-            PasswordDB.Items.Insert(Entry.entry.ID, Entry.entry);
-            SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
-            return;
+
+            var a = PasswordDB.Items[_selectedEntry] as EntryObject;
+            var entry = new EditEntry(a);
+            entry.ShowDialog();
+            if (entry.Entry == null) return;
+            // Replace the entry.
+            PasswordDB.Items.RemoveAt(entry.Entry.ID);
+            PasswordDB.Items.Insert(entry.Entry.ID, entry.Entry);
+            _selectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
         }
 
+        /// <summary>
+        /// Duplicates the selected entry and adds it to the end of the
+        /// entry list.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DuplicateEntryItem_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry == -1)
+            if (_selectedEntry == -1)
             {
-                MessageBox.Show("Select a row to copy first.", "Error copying entry.", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Select a row to copy first.", "Error copying entry.", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 return;
             }
-            EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
-            EntryObject copy = (EntryObject)obj.Clone();
+
+            if (!(PasswordDB.Items[_selectedEntry] is EntryObject obj))
+            {
+                return;
+            }
+            var copy = (EntryObject)obj.Clone();
             copy.ID = PasswordDB.Items.Count;
             PasswordDB.Items.Add(copy);
         }
 
+        /// <summary>
+        /// Removes all entries in the list.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteAllEntriesItem_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show($"Delete ALL entries in the database?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
-            {
-                PasswordDB.Items.Clear();
-            }
-            return;
+            if (MessageBox.Show("Delete ALL entries in the database?\nWARNING: (You cannot undo this once you save)",
+                    "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) ==
+                MessageBoxResult.OK) PasswordDB.Items.Clear();
         }
+
+        /// <summary>
+        /// Saves all entries and writes them to a file using the encryption.
+        /// </summary>
+        /// <see cref="Cipher"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
-            // Bless up <3
-            String FILE_PATH = Filename;
-            FileStream fs = null;
-            BinaryWriter bw = null;
+
+            var filePath = Filename;
             try
             {
-                File.WriteAllText(FILE_PATH, String.Empty);
-                fs = new FileStream(Filename, FileMode.Open);
-                bw = new BinaryWriter(fs);
-                bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", PrivateKey));
+                File.WriteAllText(filePath, string.Empty);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(
+                    "Error while saving. Make sure program has read and write permissions and try again. If this continues to fail try running the program in administrator mode.",
+                    "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
+            }
+            var fs = new FileStream(Filename, FileMode.Open, FileAccess.Write);
+            var bw = new BinaryWriter(fs);
+            try
+            {
+                bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", _privateKey));
                 bw.Write(Environment.NewLine);
-                for (int i = 0; i < PasswordDB.Items.Count; i++)
+
+                for (var i = 0; i < PasswordDB.Items.Count; i++)
                 {
-                    EntryObject temp = PasswordDB.Items[i] as EntryObject;
-                    // Write each value on a seperate line.
-                    //bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
-                    bw.Write(Cipher.Encrypt("" + i, PrivateKey));
+                    if (!(PasswordDB.Items[i] is EntryObject temp))
+                    {
+                        return;
+                    }
+                    // Write each value on a different line.
+                    bw.Write(Cipher.Encrypt("" + i, _privateKey));
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Username, PrivateKey));
+                    bw.Write(Cipher.Encrypt(temp.Username, _privateKey));
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Password, PrivateKey));
+                    bw.Write(Cipher.Encrypt(temp.Password, _privateKey));
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Date, PrivateKey));
+                    bw.Write(Cipher.Encrypt(temp.Date, _privateKey));
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Notes, PrivateKey));
+                    bw.Write(Cipher.Encrypt(temp.Notes, _privateKey));
                     bw.Write(Environment.NewLine);
                 }
             }
             catch (Exception)
             {
-                MessageBox.Show("Error while saving. Make sure program has read and write permissions and try again. If this continues to fail try running the program in administrator mode.", "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Error while saving. Make sure program has read and write permissions and try again. If this continues to fail try running the program in administrator mode.",
+                    "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                
                 return;
             }
             finally
             {
-                bw.Close();
                 fs.Close();
+                bw.Close();
             }
+
             MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-            return;
         }
+
         private void ExitItem_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Return to Main Menu?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            if (MessageBox.Show("Return to Main Menu?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) !=
+                MessageBoxResult.OK)
             {
-                MainWindow mw = new MainWindow();
-                mw.Show();
-                Close();
+                return;
             }
+            var mw = new MainWindow();
+            mw.Show();
+            Close();
         }
 
         /// <summary>
@@ -528,45 +567,62 @@ namespace PrivateGuard.PG_Windows
         private void ExportAsTextItem_Click(object sender, RoutedEventArgs e)
         {
             Stream myStream;
-            SaveFileDialog sfd = new SaveFileDialog();
+            var sfd = new SaveFileDialog
+            {
+                Filter = "TXT Files (*.txt)|*.txt",
+                FilterIndex = 1
+            };
 
-
-            sfd.Filter = "TXT Files (*.txt)|*.txt";
-            sfd.FilterIndex = 1;
-            String _filename = this.Filename.Trim().Split('\\')[this.Filename.Trim().Split('\\').Length - 1]; // Remove path
-            String name = _filename.Substring(0, _filename.Length - 4); // Remove file extension.
+            var fileName = Filename.Trim().Split('\\')[Filename.Trim().Split('\\').Length - 1]; // Remove path
+            var name = fileName.Substring(0, fileName.Length - 4); // Remove file extension.
 
             sfd.FileName = name + "_plain";
             sfd.RestoreDirectory = true;
-            Nullable<bool> result = sfd.ShowDialog();
+            var result = sfd.ShowDialog();
 
-            if (result == true)
+            if (result == false)
             {
-                if ((myStream = sfd.OpenFile()) != null)
-                {
-                    MessageBox.Show($"Saved plain text passwords file at {sfd.FileName}!\nRemember these passwords are unencrypted so handle them carefully.", "Saved!", MessageBoxButton.OK, MessageBoxImage.Information);
-                    myStream.Close();
-                    List<string> a = new List<string>();
-                    a.Add("<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->");
-                    a.Add("[Passwords Plain Text File]");
-                    a.Add("Exported from Private Guard Password Manager. (V" + MainWindow.VersionID + ")");
-                    a.Add("Exported on: " + DateTime.Now.ToString());
-                    a.Add("File Key: " + PrivateKey);
-                    double length = new FileInfo(Filename).Length;
-                    a.Add("Database Size: " + length / 1000 + " KB");
-                    a.Add("<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->");
-                    a.Add(""); // Add new line
-                    for (int i = 0; i < PasswordDB.Items.Count; i++)
-                    {
-                        EntryObject en = PasswordDB.Items[i] as EntryObject;
-                        a.Add(en.ToString());
-                    }
-                    string[] lines = a.ToArray();
-
-
-                    File.WriteAllLines(sfd.FileName, lines);
-                }
+                return;
             }
+
+            myStream = sfd.OpenFile();
+            try
+            {
+                MessageBox.Show(
+                    $"Saved plain text passwords file at {sfd.FileName}!\nRemember these passwords are unencrypted so handle them carefully.",
+                    "Saved!", MessageBoxButton.OK, MessageBoxImage.Information);
+                myStream.Close();
+                var a = new List<string>
+                {
+                    "<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->",
+                    "[Passwords Plain Text File]",
+                    $"Exported from Private Guard Password Manager. (V{MainWindow.VersionID})",
+                    $"Exported on: {DateTime.Now}",
+                    $"File Key: {_privateKey}",
+                    $"Database Size: {new FileInfo(Filename).Length / 1000}KB",
+                    "<-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->",
+                    "" // Add new line
+                };
+
+                
+                foreach (EntryObject entry in PasswordDB.Items)
+                {
+                    a.Add(entry.ToString());
+                }
+                
+
+                var lines = a.ToArray();
+
+
+                File.WriteAllLines(sfd.FileName, lines);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+
+            
+            
         }
 
         /// <summary>
@@ -576,94 +632,85 @@ namespace PrivateGuard.PG_Windows
         /// <param name="e"></param>
         private void DisableIdleTimerItem_Click(object sender, RoutedEventArgs e)
         {
-            IsIdleTimerEnabled = !IsIdleTimerEnabled;
+            _isIdleTimerEnabled = !_isIdleTimerEnabled;
             var menuItem = (MenuItem)e.OriginalSource;
-            if (IsIdleTimerEnabled)
+            if (_isIdleTimerEnabled)
             {
                 menuItem.Header = "Disable Idle Timer";
                 // Idle timer is on.
-                String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-                string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
                 b[3] = "IDLE_TIMER: Enabled";
-                string NewText = string.Empty;
-                foreach (string s in b)
-                {
-                    NewText += s + Environment.NewLine;
-                }
-                File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+                var newText = string.Empty;
+                foreach (var s in b) newText += s + Environment.NewLine;
+                File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
             }
             else
             {
                 menuItem.Header = "Enable Idle Timer";
                 // Idle timer is off.
-                String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-                string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
                 b[3] = "IDLE_TIMER: Disabled";
-                string NewText = string.Empty;
-                foreach (string s in b)
-                {
-                    NewText += s + Environment.NewLine;
-                }
-                File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+                var newText = string.Empty;
+                foreach (var s in b) newText += s + Environment.NewLine;
+                File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
             }
-
         }
 
         private void GeneratePasswordItem_Click(object sender, RoutedEventArgs e)
         {
-            PasswordGen pg = new PasswordGen();
+            var pg = new PasswordGen();
             pg.Show();
         }
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
-            MousePosition[0] = Mouse.GetPosition(this).X;
-            MousePosition[1] = Mouse.GetPosition(this).Y;
-
-
+            _mousePosition[0] = Mouse.GetPosition(this).X;
+            _mousePosition[1] = Mouse.GetPosition(this).Y;
         }
 
         //TODO: Make fonts stay with local settings file.
 
 
-        private void ChangeGlobalFont(String font)
+        private void ChangeGlobalFont(string font)
         {
-            /// casting the content into panel
-            Panel mainContainer = (Panel)Content;
+            // casting the content into panel
+            var mainContainer = (Panel)Content;
 
-            /// GetAll UIElement
-            UIElementCollection element = mainContainer.Children;
+            // GetAll UIElement
+            var element = mainContainer.Children;
 
-            /// casting the UIElementCollection into List
-            List<FrameworkElement> lstElement = element.Cast<FrameworkElement>().ToList();
+            // casting the UIElementCollection into List
+            var lstElement = element.Cast<FrameworkElement>().ToList();
 
-            /// Geting all Control from list
+            // Getting all Control from list
             var lstControl = lstElement.OfType<Control>();
 
-            foreach (Control contol in lstControl)
-            {
-                ///Hide all Controls
-                contol.FontFamily = new FontFamily(font);
-            }
+            foreach (var control in lstControl)
+                // If the control is not the minimize or exit function.
+                if (!control.Name.Contains("Program"))
+                    //Hide all Controls
+                    control.FontFamily = new FontFamily(font);
         }
 
         private void SubFontTimesNewRomanItem_Click(object sender, RoutedEventArgs e)
         {
+            
             SubFontTimesNewRomanItem.IsChecked = true;
             SubFontArialItem.IsChecked = false;
             SubFontTrebuchetMSItem.IsChecked = false;
             SubFontCourierItem.IsChecked = false;
             SubFontCalibriItem.IsChecked = false;
             ChangeGlobalFont("Times New Roman");
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
             b[4] = "GLOBAL_FONT: Times New Roman";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
         }
 
         private void SubFontArialItem_Click(object sender, RoutedEventArgs e)
@@ -674,15 +721,12 @@ namespace PrivateGuard.PG_Windows
             SubFontCourierItem.IsChecked = false;
             SubFontCalibriItem.IsChecked = false;
             ChangeGlobalFont("Arial");
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[4] = "GLOBAL_FONT: Arial";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
         }
 
         private void SubFontTrebuchetMSItem_Click(object sender, RoutedEventArgs e)
@@ -693,35 +737,28 @@ namespace PrivateGuard.PG_Windows
             SubFontCourierItem.IsChecked = false;
             SubFontCalibriItem.IsChecked = false;
             ChangeGlobalFont("Trebuchet MS");
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[4] = "GLOBAL_FONT: Trebuchet MS";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
         }
 
         private void SubFontCourierItem_Click(object sender, RoutedEventArgs e)
         {
-
             SubFontCourierItem.IsChecked = true;
             SubFontArialItem.IsChecked = false;
             SubFontTrebuchetMSItem.IsChecked = false;
             SubFontTimesNewRomanItem.IsChecked = false;
             SubFontCalibriItem.IsChecked = false;
             ChangeGlobalFont("Courier");
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[4] = "GLOBAL_FONT: Courier";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
         }
 
         private void SubFontCalibriItem_Click(object sender, RoutedEventArgs e)
@@ -731,30 +768,24 @@ namespace PrivateGuard.PG_Windows
             SubFontTimesNewRomanItem.IsChecked = false;
             SubFontCourierItem.IsChecked = false;
             ChangeGlobalFont("Calibri");
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[4] = "GLOBAL_FONT: Calibri";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
         }
 
         private void TextSize8PXItem_Click(object sender, RoutedEventArgs e)
         {
             TextSize8PXItem.IsChecked = true;
             PasswordDB.FontSize = 8;
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[5] = "FONT_SIZE: 8px";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
             TextSize12PXItem.IsChecked = false;
             TextSize16PXItem.IsChecked = false;
             TextSize20PXItem.IsChecked = false;
@@ -764,15 +795,12 @@ namespace PrivateGuard.PG_Windows
         {
             TextSize12PXItem.IsChecked = true;
             PasswordDB.FontSize = 12;
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[5] = "FONT_SIZE: 12px";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
             TextSize8PXItem.IsChecked = false;
             TextSize16PXItem.IsChecked = false;
             TextSize20PXItem.IsChecked = false;
@@ -782,15 +810,12 @@ namespace PrivateGuard.PG_Windows
         {
             TextSize16PXItem.IsChecked = true;
             PasswordDB.FontSize = 16;
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[5] = "FONT_SIZE: 16px";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
             TextSize8PXItem.IsChecked = false;
             TextSize12PXItem.IsChecked = false;
             TextSize20PXItem.IsChecked = false;
@@ -800,15 +825,12 @@ namespace PrivateGuard.PG_Windows
         {
             TextSize20PXItem.IsChecked = true;
             PasswordDB.FontSize = 20;
-            String Data = File.ReadAllText(MainWindow.SETTINGS_DIR);
-            string[] b = Data.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             b[5] = "FONT_SIZE: 20px";
-            string NewText = string.Empty;
-            foreach (string s in b)
-            {
-                NewText += s + Environment.NewLine;
-            }
-            File.WriteAllText(MainWindow.SETTINGS_DIR, NewText);
+            var newText = new StringBuilder();
+            foreach (var s in b) newText.Append(s).Append(Environment.NewLine);
+            File.WriteAllText(MainWindow.SETTINGS_DIR, newText.ToString());
             TextSize8PXItem.IsChecked = false;
             TextSize16PXItem.IsChecked = false;
             TextSize12PXItem.IsChecked = false;
@@ -816,159 +838,154 @@ namespace PrivateGuard.PG_Windows
 
         private void HelpItem_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/jluvisi2021/PrivateGuard/wiki");
-
+            Process.Start("https://github.com/jluvisi2021/PrivateGuard/wiki");
         }
 
         private void ContactDevItem_Click(object sender, RoutedEventArgs e)
         {
-            Contact c = new Contact();
+            var c = new Contact();
             c.ShowDialog();
         }
 
         private void Copy_Password_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry != -1)
+            if (_selectedEntry == -1)
+                return;
+            if (!(PasswordDB.Items[_selectedEntry] is EntryObject obj))
             {
-                EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
-                Clipboard.SetText(obj.Password);
+                return;
             }
+            Clipboard.SetText(obj.Password);
         }
 
         private void CopyUsername_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry != -1)
+            if (_selectedEntry == -1)
+                return;
+            if (!(PasswordDB.Items[_selectedEntry] is EntryObject obj))
             {
-                EntryObject obj = PasswordDB.Items[SelectedEntry] as EntryObject;
-                Clipboard.SetText(obj.Username);
+                return;
             }
+            Clipboard.SetText(obj.Username);
         }
 
         private void EditEntry_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry == -1)
-            {
-                return;
-            }
-            EntryObject a = PasswordDB.Items[SelectedEntry] as EntryObject;
-            EditEntry Entry = new EditEntry(a);
-            Entry.ShowDialog();
-            if (Entry.entry == null)
-            {
-                return;
-            }
-            PasswordDB.Items.RemoveAt(Entry.entry.ID);
-            PasswordDB.Items.Insert(Entry.entry.ID, Entry.entry);
-            SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
-            return;
+            if (_selectedEntry == -1) return;
+            var a = PasswordDB.Items[_selectedEntry] as EntryObject;
+            var entry = new EditEntry(a);
+            entry.ShowDialog();
+            if (entry.Entry == null) return;
+            PasswordDB.Items.RemoveAt(entry.Entry.ID);
+            PasswordDB.Items.Insert(entry.Entry.ID, entry.Entry);
+            _selectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
         }
 
         private void RemoveEntry_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedEntry == -1)
+            if (_selectedEntry == -1) return;
+            if (MessageBox.Show($"Delete entry at {_selectedEntry}?\nWARNING: (You cannot undo this once you save)",
+                "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
             {
                 return;
             }
-            if (MessageBox.Show($"Delete entry at {SelectedEntry}?\nWARNING: (You cannot undo this once you save)", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
-            {
-                PasswordDB.Items.RemoveAt(SelectedEntry);
 
-                for (int i = 0; i < PasswordDB.Items.Count; i++)
+            PasswordDB.Items.RemoveAt(_selectedEntry);
+
+                for (var i = 0; i < PasswordDB.Items.Count; i++)
                 {
-                    EntryObject obj = PasswordDB.Items[i] as EntryObject;
-                    obj.ID = i;
+                if (!(PasswordDB.Items[i] is EntryObject obj))
+                {
+                    return;
+                }
+                obj.ID = i;
                     // Replace the object.
                     PasswordDB.Items.RemoveAt(i);
                     PasswordDB.Items.Insert(i, obj);
                 }
-                SelectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
-                return;
-            }
+
+                _selectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
+            
         }
 
         private void SaveAsItem_Click(object sender, RoutedEventArgs e)
         {
-            String Key1 = PrivateKey;
-            if (MessageBox.Show("Save with a different Encryption Key?\nThis will be the key you use to open this new file.", "Encryption Key", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            var specifiedKey = _privateKey;
+            if (MessageBox.Show(
+                "Save with a different Encryption Key?\nThis will be the key you use to open this new file.",
+                "Encryption Key", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                SaveAsNewKey NewKeyWindow = new SaveAsNewKey();
-                NewKeyWindow.ShowDialog();
-                Key1 = NewKeyWindow.NewKey;
-                if(string.IsNullOrWhiteSpace(Key1))
+                var newKeyWindow = new SaveAsNewKey();
+                newKeyWindow.ShowDialog();
+                specifiedKey = newKeyWindow.NewKey;
+                if (string.IsNullOrWhiteSpace(specifiedKey)) return;
+            }
+
+            var sfd = new SaveFileDialog
+            {
+                Filter = "PGM Files (*.pgm)|*.pgm",
+                FilterIndex = 1,
+                FileName = "MyManager",
+                RestoreDirectory = true
+            };
+            var result = sfd.ShowDialog();
+
+            if (result != true) return;
+
+            File.WriteAllText(sfd.FileName, string.Empty);
+            var fs = new FileStream(sfd.FileName, FileMode.Open);
+            var bw = new BinaryWriter(fs);
+            bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", specifiedKey));
+            bw.Write(Environment.NewLine);
+            // Write each object on a different line
+            for (var i = 0; i < PasswordDB.Items.Count; i++)
+            {
+                if (!(PasswordDB.Items[i] is EntryObject temp))
                 {
                     return;
                 }
+
+                bw.Write(Cipher.Encrypt("" + i, specifiedKey));
+                bw.Write(Environment.NewLine);
+                bw.Write(Cipher.Encrypt(temp.Username, specifiedKey));
+                bw.Write(Environment.NewLine);
+                bw.Write(Cipher.Encrypt(temp.Password, specifiedKey));
+                bw.Write(Environment.NewLine);
+                bw.Write(Cipher.Encrypt(temp.Date, specifiedKey));
+                bw.Write(Environment.NewLine);
+                bw.Write(Cipher.Encrypt(temp.Notes, specifiedKey));
+                bw.Write(Environment.NewLine);
             }
 
-
-
-            Stream myStream;
-            SaveFileDialog sfd = new SaveFileDialog();
-
-
-            sfd.Filter = "PGM Files (*.pgm)|*.pgm";
-            sfd.FilterIndex = 1;
-            sfd.FileName = "MyManager";
-            sfd.RestoreDirectory = true;
-            Nullable<bool> result = sfd.ShowDialog();
-
-            if (result == true)
-            {
-                if ((myStream = sfd.OpenFile()) != null)
-                {
-                    myStream.Close();
-
-                    File.WriteAllText(sfd.FileName, String.Empty);
-                    FileStream fs = new FileStream(sfd.FileName, FileMode.Open);
-                    BinaryWriter bw = new BinaryWriter(fs);
-                    bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", Key1));
-                    bw.Write(Environment.NewLine);
-                    for (int i = 0; i < PasswordDB.Items.Count; i++)
-                    {
-                        EntryObject temp = PasswordDB.Items[i] as EntryObject;
-                        // Write each value on a seperate line.
-                        //bw.Write("" + i + Seperator + temp.Username + Seperator + temp.Password + Seperator + temp.Date + Seperator + temp.Notes);
-                        bw.Write(Cipher.Encrypt("" + i, Key1));
-                        bw.Write(Environment.NewLine);
-                        bw.Write(Cipher.Encrypt(temp.Username, Key1));
-                        bw.Write(Environment.NewLine);
-                        bw.Write(Cipher.Encrypt(temp.Password, Key1));
-                        bw.Write(Environment.NewLine);
-                        bw.Write(Cipher.Encrypt(temp.Date, Key1));
-                        bw.Write(Environment.NewLine);
-                        bw.Write(Cipher.Encrypt(temp.Notes, Key1));
-                        bw.Write(Environment.NewLine);
-                    }
-                    MessageBox.Show($"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.", "Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                    bw.Close();
-                    fs.Close();
+            MessageBox.Show(
+                $"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.",
+                "Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
+            
+            bw.Close();
+            fs.Close();
 
                     // Code to write the stream goes here.
-
-
-                }
-            }
+                
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.OemPlus)
+            switch (e.Key)
             {
-                if(Keyboard.IsKeyDown(Key.LeftCtrl))
-                {
-                    IncreaseFont((int)PasswordDB.FontSize);
-                }
-            }
-            if(e.Key == Key.OemMinus)
-            {
-                if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                {
-                    DecreaseFont((int)PasswordDB.FontSize);
-                }
+                case Key.OemPlus:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                        IncreaseFont((int)PasswordDB.FontSize);
+                    break;
+                case Key.OemMinus:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                        DecreaseFont((int)PasswordDB.FontSize);
+                    break;
+                default:
+                    return;
             }
         }
     }
+
     public class EntryObject : ICloneable
     {
         public int ID { get; set; }
@@ -977,7 +994,6 @@ namespace PrivateGuard.PG_Windows
 
         public string Date { get; set; }
         public string Notes { get; set; }
-
 
 
         public EntryObject(int ID, string Username, string Password, string Date, string Notes)
@@ -995,14 +1011,12 @@ namespace PrivateGuard.PG_Windows
         /// <returns></returns>
         public object Clone()
         {
-            return this.MemberwiseClone();
+            return MemberwiseClone();
         }
 
         public override string ToString()
         {
-            return $"ID: {this.ID} | Username:{this.Username} | Password:{this.Password} | Date: {this.Date} | Notes: {this.Notes}";
+            return $"ID: {ID} | Username:{Username} | Password:{Password} | Date: {Date} | Notes: {Notes}";
         }
-
-
     }
 }

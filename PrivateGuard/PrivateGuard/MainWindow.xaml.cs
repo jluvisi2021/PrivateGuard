@@ -1,65 +1,58 @@
-﻿using Microsoft.Win32;
-using PrivateGuard.PG_Data;
-using PrivateGuard.PG_Windows;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.Win32;
+using PrivateGuard.PG_Data;
+using PrivateGuard.PG_Windows;
 
 namespace PrivateGuard
 {
-
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly string username = "jluvisi";
+        private const string Username = "jluvisi";
+        private bool _showFileKeyField;
+        public static string VersionID = "1.0.1-BETA";
 
-        bool ShowFileKeyField = false;
-        public static string VersionID = "1.0.1";
-        public static readonly string SETTINGS_DIR = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
+        public static readonly string SETTINGS_DIR =
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
 
 
         public MainWindow()
         {
-
-
             InitializeComponent();
             SetupPrimaryScreen();
 
-            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             // Access settings.bin file.
-            if (!File.Exists(appdata + "\\PrivateGuard"))
-            {
-                Directory.CreateDirectory(appdata + "\\PrivateGuard");
-                Console.WriteLine("Directory " + appdata + "\\PrivateGuard" + " not found.. Creating...");
-            }
+            if (!File.Exists(appdata + "\\PrivateGuard")) Directory.CreateDirectory(appdata + "\\PrivateGuard");
             if (!File.Exists(appdata + "\\PrivateGuard\\settings.bin"))
             {
-                String[] testing =
+                string[] testing =
                 {
-                    "Private Guard Settings File: (V." + VersionID + ")",
-                    "Created On: " + DateTime.Now.ToString(),
+                    $"Private Guard Settings File: (V.{VersionID})",
+                    $"Created On: {DateTime.Now}",
                     "",
                     "IDLE_TIMER: Enabled",
                     "GLOBAL_FONT: Trebuchet MS",
                     "FONT_SIZE: 12px"
                 };
                 File.WriteAllLines(appdata + "\\PrivateGuard\\settings.bin", testing);
-                Console.WriteLine("Creating settings file.");
             }
-
         }
 
         /// <summary>
-        /// Organizes the primary screen through code rather than XAML.
+        ///     Organizes the primary screen through code rather than XAML.
         /// </summary>
-        void SetupPrimaryScreen()
+        private void SetupPrimaryScreen()
         {
-            MainWindow mw = this;
+            var mw = this;
             //mw.Title = "Private Guard | Version: " + VersionID;
             mw.VersionLabel.Content = "Version: " + VersionID;
             //mw.WindowStyle = new WindowStyle {  }; // Make blank top bar.
@@ -70,40 +63,36 @@ namespace PrivateGuard
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
-            {
-
-                Close();
-            }
-
+            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) ==
+                MessageBoxResult.OK) Close();
         }
 
         private void ExitProgramLabel_MouseEnter(object sender, MouseEventArgs e)
         {
-            Label ExitLabel = sender as Label;
-            ExitLabel.Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
+            ((Label) sender).Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
         }
+
 
         private void ExitProgramLabel_MouseLeave(object sender, MouseEventArgs e)
         {
-            Label ExitLabel = sender as Label;
-            ExitLabel.Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
+            ((Label) sender).Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
         }
 
         private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            DragMove(); // Allows the dragging of the application.
+            DragMove();
         }
 
         private void ToggleViewButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowFileKeyField = !ShowFileKeyField;
-            ToggleViewButton.Content = ShowFileKeyField ? ToggleViewButton.Content = "Hide" : ToggleViewButton.Content = "Show";
-            if (ShowFileKeyField)
+            _showFileKeyField = !_showFileKeyField;
+            ToggleViewButton.Content =
+                _showFileKeyField ? ToggleViewButton.Content = "Hide" : ToggleViewButton.Content = "Show";
+            if (_showFileKeyField)
             {
                 FileKeyField.Visibility = Visibility.Hidden;
                 ViewPasswordTextBox.Visibility = Visibility.Visible;
-                ViewPasswordTextBox.Text = FileKeyField.Password.ToString();
+                ViewPasswordTextBox.Text = FileKeyField.Password;
             }
             else
             {
@@ -111,87 +100,86 @@ namespace PrivateGuard
                 ViewPasswordTextBox.Visibility = Visibility.Hidden;
                 FileKeyField.Password = ViewPasswordTextBox.Text;
             }
-
         }
 
 
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
             // Open Window Selector and find .txt file (or binary file) to open.
-            OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".pgm";
-            dlg.Filter = "PGM Files (*.pgm)|*.pgm";
-            Nullable<bool> result = dlg.ShowDialog();
-            if (result == true)
+            var dlg = new OpenFileDialog
             {
-                string fileName = dlg.FileName;
-                SelectedFileField.Text = fileName;
+                DefaultExt = ".pgm",
+                Filter = "PGM Files (*.pgm)|*.pgm"
+            };
+            var result = dlg.ShowDialog();
+            if (result == false) return;
 
-            }
+            var fileName = dlg.FileName;
+            SelectedFileField.Text = fileName;
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            String a;
-            if (UsernameField.Text != username)
+            string a;
+            if (UsernameField.Text != Username)
             {
-                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
                 return;
             }
-            if (string.IsNullOrWhiteSpace(FileKeyField.Password.ToString()))
+
+            if (string.IsNullOrWhiteSpace(FileKeyField.Password))
             {
-                DisplayErrorMessage(ERROR_TYPES.NO_FILE_KEY);
+                DisplayErrorMessage(ErrorTypes.NO_FILE_KEY);
                 return;
             }
+
             if (string.IsNullOrWhiteSpace(SelectedFileField.Text))
             {
-                DisplayErrorMessage(ERROR_TYPES.NO_FILE_SELECTED);
+                DisplayErrorMessage(ErrorTypes.NO_FILE_SELECTED);
                 return;
             }
-            string _Checkable = ShowFileKeyField ? ViewPasswordTextBox.Text : FileKeyField.Password.ToString();
+
+            var checkable = _showFileKeyField ? ViewPasswordTextBox.Text : FileKeyField.Password;
 
             // try
             // {
             a = SelectedFileField.Text;
-            FileStream fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
-            BinaryReader bw2 = new BinaryReader(fs2);
-            string modifier_value;
+            var fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
+            var bw2 = new BinaryReader(fs2);
+            string modifierValue;
             try
             {
-                modifier_value = Cipher.Decrypt(bw2.ReadString(), _Checkable);
-
+                modifierValue = Cipher.Decrypt(bw2.ReadString(), checkable);
             }
             catch (Exception)
             {
-                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
                 fs2.Close();
                 bw2.Close();
                 return;
             }
+
             //string data = bw2.ReadString();
-            if (modifier_value != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+            if (modifierValue != "OKAY_TO_ACCESS_MODIFIER_VALUE")
             {
-                DisplayErrorMessage(ERROR_TYPES.WRONG_CREDENTIALS);
+                DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
                 fs2.Close();
                 bw2.Close();
                 return;
             }
+
             fs2.Close();
             bw2.Close();
             //MessageBox.Show("ALL GOOD!");
             Database db;
-            if (ShowFileKeyField)
-            {
-                db = new Database(a, _Checkable);
-            }
+            if (_showFileKeyField)
+                db = new Database(a, checkable);
             else
-            {
-                db = new Database(a, _Checkable);
-            }
-            if(new FileInfo(SelectedFileField.Text).Length > 100000)
-            {
-                MessageBox.Show("Your file has exceeded the reccomended file size limit (100KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!", "File Size Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+                db = new Database(a, checkable);
+            if (new FileInfo(SelectedFileField.Text).Length > 100000)
+                MessageBox.Show(
+                    "Your file has exceeded the reccomended file size limit (100KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!",
+                    "File Size Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             db.Show();
             Close();
             // All is good attempt to open file.
@@ -201,63 +189,65 @@ namespace PrivateGuard
             //DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
             //    return;
             // }
-
         }
 
         /// <summary>
-        /// Display a message to the user.
+        ///     Display a message to the user.
         /// </summary>
         /// <param name="e"></param>
-        private static void DisplayErrorMessage(ERROR_TYPES e)
+        private static void DisplayErrorMessage(ErrorTypes e)
         {
             switch (e)
             {
-                case ERROR_TYPES.WRONG_CREDENTIALS:
-                    MessageBox.Show("Incorrect Credentials. Please validate that the username and filekey are set properly.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
+                case ErrorTypes.WRONG_CREDENTIALS:
+                    MessageBox.Show(
+                        "Incorrect Credentials. Please validate that the username and filekey are set properly.",
+                        "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
-                case ERROR_TYPES.NO_FILE_SELECTED:
-                    MessageBox.Show("No file selected. Please select a file using the \"Select\" button.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
+                case ErrorTypes.NO_FILE_SELECTED:
+                    MessageBox.Show("No file selected. Please select a file using the \"Select\" button.",
+                        "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
-                case ERROR_TYPES.NO_FILE_KEY:
-                    MessageBox.Show("No file key found. Please fill out the file key text box with the respective file key for the selected file.", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
+                case ErrorTypes.NO_FILE_KEY:
+                    MessageBox.Show(
+                        "No file key found. Please fill out the file key text box with the respective file key for the selected file.",
+                        "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
-                case ERROR_TYPES.FILE_NOT_FOUND:
-                    MessageBox.Show("Could not find the file specified! Does it exist?", "Error logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
-                    break;
-                default:
-                    Console.WriteLine("Could not find error: " + e.ToString());
+                case ErrorTypes.FILE_NOT_FOUND:
+                    MessageBox.Show("Could not find the file specified! Does it exist?", "Error logging in.",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
         }
 
-        enum ERROR_TYPES
+        private enum ErrorTypes
         {
-            WRONG_CREDENTIALS, NO_FILE_SELECTED, NO_FILE_KEY, FILE_NOT_FOUND
+            WRONG_CREDENTIALS,
+            NO_FILE_SELECTED,
+            NO_FILE_KEY,
+            FILE_NOT_FOUND
         }
 
         private void DocumentationButton_Click(object sender, RoutedEventArgs e)
         {
-
         }
-        public static bool IsFileKeyValid(String str)
-        {
 
+        public static bool IsFileKeyValid(string str)
+        {
             if (str.Length > 4 && str.Length < 256 && !str.Contains(" ") && !string.IsNullOrWhiteSpace(str))
-            {
                 return true;
-            }
             return false;
         }
 
         private void NewFileButton_Click(object sender, RoutedEventArgs e)
         {
-            FileKeyWindow win = new FileKeyWindow();
+            var win = new FileKeyWindow();
             win.Show();
         }
 
         private void Click_for_Source_Code_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/jluvisi2021/PrivateGuard");
+            Process.Start("https://github.com/jluvisi2021/PrivateGuard");
         }
 
         private void Click_for_Source_Code_MouseEnter(object sender, MouseEventArgs e)
@@ -268,7 +258,6 @@ namespace PrivateGuard
         private void Click_for_Source_Code_MouseLeave(object sender, MouseEventArgs e)
         {
             Click_for_Source_Code.Foreground = new SolidColorBrush(Color.FromRgb(187, 192, 195));
-
         }
 
         private void MinimizeProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
@@ -276,17 +265,11 @@ namespace PrivateGuard
             WindowState = WindowState.Minimized;
         }
 
-        private void MinimizeProgramLabel_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Label lbl = sender as Label;
-            lbl.Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
-        }
+        private void MinimizeProgramLabel_MouseEnter(object sender, MouseEventArgs e) =>
+            ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
+        
 
-        private void MinimizeProgramLabel_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Label lbl = sender as Label;
-            lbl.Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
-        }
+        private void MinimizeProgramLabel_MouseLeave(object sender, MouseEventArgs e) =>
+            ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
     }
-
 }

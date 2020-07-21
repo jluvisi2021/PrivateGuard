@@ -1,22 +1,22 @@
-﻿using Microsoft.Win32;
-using PrivateGuard.PG_Data;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
+using Microsoft.Win32;
+using PrivateGuard.PG_Data;
 
 namespace PrivateGuard.PG_Windows
 {
     /// <summary>
-    /// Interaction logic for FileKeyWindow.xaml
+    ///     Interaction logic for FileKeyWindow.xaml
     /// </summary>
-    public partial class FileKeyWindow : Window
+    public partial class FileKeyWindow
     {
-        private String Key { get; set; }
+        private string Key { get; set; }
+
         public FileKeyWindow()
         {
             InitializeComponent();
             Title = "Create your file key.";
-
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -24,58 +24,49 @@ namespace PrivateGuard.PG_Windows
             if (!MainWindow.IsFileKeyValid(FileKeyTextBlock.Text))
             {
                 FileKeyTextBlock.Text = "";
-                MessageBox.Show("File key not valid! Please meet the requirments listed.", "File Key Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("File key not valid! Please meet the requirments listed.", "File Key Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
             else
             {
                 Key = FileKeyTextBlock.Text;
-                MessageBox.Show("File key accepted. Please choose a location to save the password database file.", "Save file.", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("File key accepted. Please choose a location to save the password database file.",
+                    "Save file.", MessageBoxButton.OK, MessageBoxImage.Information);
 
 
-                Stream myStream;
-                SaveFileDialog sfd = new SaveFileDialog();
-
-
-                sfd.Filter = "PGM Files (*.pgm)|*.pgm";
-                sfd.FilterIndex = 1;
-                sfd.FileName = "MyManager";
-                sfd.RestoreDirectory = true;
-                Nullable<bool> result = sfd.ShowDialog();
-
-                if (result == true)
+                var sfd = new SaveFileDialog
                 {
-                    if ((myStream = sfd.OpenFile()) != null)
-                    {
-                        MessageBox.Show($"Saved file at: {sfd.FileName}! \nTo access and/or edit the file input the file key and then use the \"Open File\" button.", "Saved File", MessageBoxButton.OK, MessageBoxImage.Information);
-                        myStream.Close();
+                    Filter = "PGM Files (*.pgm)|*.pgm",
+                    FilterIndex = 1,
+                    FileName = "MyManager",
+                    RestoreDirectory = true
+                };
+                var result = sfd.ShowDialog();
 
+                if (result != true) return;
 
-                        FileStream fs = new FileStream(sfd.FileName, FileMode.Open);
-                        BinaryWriter bw = new BinaryWriter(fs);
-                        bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", Key));
-
-                        bw.Close();
-                        fs.Close();
-
-
-                        // Code to write the stream goes here.
-
-
-                    }
-                }
-                Close();
+                File.WriteAllText(sfd.FileName, string.Empty);
+                var fs = new FileStream(sfd.FileName, FileMode.Open);
+                var bw = new BinaryWriter(fs);
+                bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", Key));
+                bw.Write(Environment.NewLine);
+                bw.Close();
+                fs.Close();
             }
+            Close();
         }
-        readonly Random rand = new Random();
+
+    
+
+        private readonly Random rand = new Random();
+
         private void GenerateSecureKeyButton_Click(object sender, RoutedEventArgs e)
         {
-            String gen = "";
-            char[] PasswordGenOptionals = "abcdefghikjlmnopqrstuvwxyz1234567890!@#$%^&*()[]{}:'>?/.<,ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-            for (int i = 0; i < rand.Next(8,32); i++)
-            {
-
+            var gen = "";
+            var PasswordGenOptionals =
+                "abcdefghikjlmnopqrstuvwxyz1234567890!@#$%^&*()[]{}:'>?/.<,ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            for (var i = 0; i < rand.Next(8, 32); i++)
                 gen += PasswordGenOptionals[rand.Next(0, PasswordGenOptionals.Length - 1)];
-            }
             FileKeyTextBlock.Text = gen;
         }
     }
