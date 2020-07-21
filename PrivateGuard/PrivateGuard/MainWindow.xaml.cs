@@ -121,11 +121,6 @@ namespace PrivateGuard
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             string a = string.Empty;
-            if (UsernameField.Text != Username)
-            {
-                DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
-                return;
-            }
 
             if (string.IsNullOrWhiteSpace(FileKeyField.Password))
             {
@@ -183,7 +178,7 @@ namespace PrivateGuard
                 db.Show();
                 Close();
             }
-            catch (FileNotFoundException)
+            catch (Exception)
             {
                 DisplayErrorMessage(ErrorTypes.FILE_NOT_FOUND);
             }

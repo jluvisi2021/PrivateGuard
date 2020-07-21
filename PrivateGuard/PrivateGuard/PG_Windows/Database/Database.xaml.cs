@@ -337,7 +337,7 @@ namespace PrivateGuard.PG_Windows
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MessageBox.Show("Exit PrivateGuard?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) ==
+            if (MessageBox.Show("Exit PrivateGuard?\nMake sure your changes are saved!", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question) ==
                 MessageBoxResult.OK) Close();
         }
 

@@ -34,22 +34,9 @@
         <Rectangle Grid.ColumnSpan="2" Fill="#FF434351" HorizontalAlignment="Left" Height="30" Stroke="#FF555569" VerticalAlignment="Top" Width="500" MouseDown="Rectangle_MouseDown"/>
         <Rectangle Grid.ColumnSpan="2" Fill="#FF171717" HorizontalAlignment="Left" Height="3" Margin="10,126,0,0" Stroke="#FF555569" VerticalAlignment="Top" Width="475"/>
         <Label x:Name="ExitProgramLabel" Grid.ColumnSpan="2" Content="X" Margin="466,-9.25,0,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="32" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave"/>
-        <Label x:Name="UsernameLabel" Grid.ColumnSpan="2" Content="Username" HorizontalAlignment="Left" Margin="10,144,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold"/>
-        <Label x:Name="FileKeyLabel" Grid.ColumnSpan="2" Content="File Key" HorizontalAlignment="Left" Margin="10,195,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold"/>
-        <Label x:Name="SelectedFileLabel" Grid.ColumnSpan="2" Content="Selected File" HorizontalAlignment="Left" Margin="10,246,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold" FontStyle="Italic"/>
-        <TextBox x:Name="UsernameField" Style="{StaticResource RoundedCornerTextBox}" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="24" Margin="112,144,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Background="#FFC1B9B9" Foreground="#FF070606" SelectionBrush="#FFED687C" FontFamily="SimSun" ToolTip="Enter the username associated with the application." FontSize="16">
-            <TextBox.Effect>
-                <DropShadowEffect BlurRadius="0.1" ShadowDepth="1"/>
-            </TextBox.Effect>
-
-            <TextBox.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="CornerRadius" Value="3"/>
-                </Style>
-            </TextBox.Resources>
-
-        </TextBox>
-        <TextBox x:Name="SelectedFileField" Style="{StaticResource RoundedCornerTextBox}" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="24" Margin="112,246,0,0" TextWrapping="Wrap" VerticalAlignment="Top" ToolTip ="Select the file to use by using the 'Select' button." Width="140" Background="#FFC1B9B9" Foreground="#FF070606" SelectionBrush="#FFED687C" FontFamily="SimSun" FontSize="16">
+        <Label x:Name="FileKeyLabel" Grid.ColumnSpan="2" Content="File Key" HorizontalAlignment="Left" Margin="10,160,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold"/>
+        <Label x:Name="SelectedFileLabel" Grid.ColumnSpan="2" Content="Selected File" HorizontalAlignment="Left" Margin="12,221,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold" FontStyle="Italic"/>
+        <TextBox x:Name="SelectedFileField" Style="{StaticResource RoundedCornerTextBox}" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="31" Margin="112,221,0,0" TextWrapping="Wrap" VerticalAlignment="Top" ToolTip ="Select the file to use by using the 'Select' button." Width="140" Background="#FFC1B9B9" Foreground="#FF070606" SelectionBrush="#FFED687C" FontFamily="SimSun" FontSize="16">
 
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -62,7 +49,7 @@
             </TextBox.Effect>
 
         </TextBox>
-        <Button x:Name="ToggleViewButton" Grid.ColumnSpan="2" Content="Show" HorizontalAlignment="Left" Margin="257,197,0,0" VerticalAlignment="Top" Width="73" Height="24" FontFamily="Trebuchet MS" ToolTip ="Click to show the File Key." FontWeight="Bold" FontSize="13" Click="ToggleViewButton_Click" RenderTransformOrigin="0.479,1.015">
+        <Button x:Name="ToggleViewButton" Grid.ColumnSpan="2" Content="Show" HorizontalAlignment="Left" Margin="257,160,0,0" VerticalAlignment="Top" Width="73" Height="24" FontFamily="Trebuchet MS" ToolTip ="Click to show the File Key." FontWeight="Bold" FontSize="13" Click="ToggleViewButton_Click" RenderTransformOrigin="0.479,1.015">
 
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -70,7 +57,7 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Button x:Name="SelectButton" ToolTip ="Click to open file manager and select a file." Grid.ColumnSpan="2" Content="Select" HorizontalAlignment="Left" Margin="257,246,0,0" VerticalAlignment="Top" Width="73" Height="24" FontFamily="Trebuchet MS" FontWeight="Bold" FontSize="13" Click="SelectButton_Click">
+        <Button x:Name="SelectButton" ToolTip ="Click to open file manager and select a file." Grid.ColumnSpan="2" Content="Select" HorizontalAlignment="Left" Margin="257,221,0,0" VerticalAlignment="Top" Width="73" Height="24" FontFamily="Trebuchet MS" FontWeight="Bold" FontSize="13" Click="SelectButton_Click">
 
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -85,7 +72,7 @@
 
             <Underline>Github Source Hyperlink</Underline>
         </Label>
-        <PasswordBox x:Name="FileKeyField" Style="{StaticResource RoundCornerPasswordGray}" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="112,197,0,0" VerticalAlignment="Top" Width="140"  Height="24">
+        <PasswordBox x:Name="FileKeyField" Style="{StaticResource RoundCornerPasswordGray}" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="112,160,0,0" VerticalAlignment="Top" Width="140"  Height="32">
             <PasswordBox.Effect>
                 <DropShadowEffect BlurRadius="0.1" ShadowDepth="1"/>
             </PasswordBox.Effect>

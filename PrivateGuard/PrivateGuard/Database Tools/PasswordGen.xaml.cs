@@ -14,8 +14,8 @@ namespace PrivateGuard.Database_Tools
         private readonly Random _random = new Random();
         private readonly char[] _normalChars = "abcdefghiklmnopqrstuvwxyz".ToCharArray();
         private readonly char[] _capitalChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-        private readonly char[] _specialChars = "123456789!@#$%^&*()[]{}:;<>".ToCharArray();
-
+        private readonly char[] _specialChars = "!@#$%^&*()[]{}:;<>".ToCharArray();
+        private readonly char[] _numericalChars = "123456789".ToCharArray();
         public PasswordGen()
         {
             InitializeComponent();
@@ -34,9 +34,11 @@ namespace PrivateGuard.Database_Tools
             var password = new StringBuilder();
             var capsEnabled = CapitalLetters.IsChecked ?? true;
             var specialEnabled = SpecialSymbols.IsChecked ?? true;
+            var numbersEnabled = UseNumbers.IsChecked ?? true;
             var values = new List<char>(_normalChars);
             if (capsEnabled) values.AddRange(_capitalChars);
             if (specialEnabled) values.AddRange(_specialChars);
+            if(numbersEnabled) values.AddRange(_numericalChars);
             for (var i = 0; i < int.Parse(PasswordLengthCurrent.Content.ToString()); i++)
                 password.Append(values[_random.Next(0, values.Count)]);
             PasswordBox.Text = password.ToString();

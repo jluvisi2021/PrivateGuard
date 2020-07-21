@@ -19,7 +19,7 @@ namespace PrivateGuard.Database_Tools
         {
             if(MessageBox.Show(
                 "To contact me please email jprivateguard@gmail.com.\nIf you are reporting an issue please select \"Yes\" on this message prompt.\nSelecting \"Yes\" will copy the message in the correct format to your clipboard.\nAfter it is coped send me the email by pasting it into your email client.\nThe subject should be \"Private Guard Issue\".",
-                "Report Issue.", MessageBoxButton.YesNo, MessageBoxImage.Hand) != MessageBoxResult.Yes)
+                "Report Issue.", MessageBoxButton.YesNo, MessageBoxImage.Information) != MessageBoxResult.Yes)
             {
                 return;
             }

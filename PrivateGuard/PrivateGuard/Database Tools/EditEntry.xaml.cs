@@ -33,7 +33,12 @@ namespace PrivateGuard.Database_Tools
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
+            if (PasswordStrengthBar.Value < 15)
+            {
+                MessageBox.Show(
+                    "Your password has been detected as being weak!\nIt is heavily recommended you attempt to make your password stronger.",
+                    "Password Strength", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
             var obj = new EntryObject(Entry.ID, UsernameField.Text, PasswordField.Text,
                 DateTime.Today.ToShortDateString(), NotesField.Text);
             Entry = obj;
