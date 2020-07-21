@@ -9,16 +9,25 @@ using Microsoft.Win32;
 using PrivateGuard.PG_Data;
 using PrivateGuard.PG_Windows;
 
+/*
+██████╗░██████╗░██╗██╗░░░██╗░█████╗░████████╗███████╗  ░██████╗░██╗░░░██╗░█████╗░██████╗░██████╗░
+██╔══██╗██╔══██╗██║██║░░░██║██╔══██╗╚══██╔══╝██╔════╝  ██╔════╝░██║░░░██║██╔══██╗██╔══██╗██╔══██╗
+██████╔╝██████╔╝██║╚██╗░██╔╝███████║░░░██║░░░█████╗░░  ██║░░██╗░██║░░░██║███████║██████╔╝██║░░██║
+██╔═══╝░██╔══██╗██║░╚████╔╝░██╔══██║░░░██║░░░██╔══╝░░  ██║░░╚██╗██║░░░██║██╔══██║██╔══██╗██║░░██║
+██║░░░░░██║░░██║██║░░╚██╔╝░░██║░░██║░░░██║░░░███████╗  ╚██████╔╝╚██████╔╝██║░░██║██║░░██║██████╔╝
+╚═╝░░░░░╚═╝░░╚═╝╚═╝░░░╚═╝░░░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝  ░╚═════╝░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░
+ */
+
 namespace PrivateGuard
+
 {
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string Username = "jluvisi";
         private bool _showFileKeyField;
-        public static string VersionID = "1.0.1-BETA";
+        public static string VersionID = "1.0.2-BETA";
 
         public static readonly string SETTINGS_DIR =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
@@ -223,6 +232,7 @@ namespace PrivateGuard
 
         private void DocumentationButton_Click(object sender, RoutedEventArgs e)
         {
+            Process.Start("https://github.com/jluvisi2021/PrivateGuard/wiki");
         }
 
         public static bool IsFileKeyValid(string str)
@@ -263,6 +273,6 @@ namespace PrivateGuard
         
 
         private void MinimizeProgramLabel_MouseLeave(object sender, MouseEventArgs e) =>
-            ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(184, 186, 189));
+            ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
     }
 }

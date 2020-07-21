@@ -42,8 +42,8 @@
             </Button.Resources>
 
         </Button>
-        <Label x:Name="PasswordLabel1" Content="Strength" Margin="10,178,345,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontStyle="Italic"/>
-        <ProgressBar x:Name="PasswordStrengthBar" HorizontalAlignment="Left" Height="17" Margin="74,183,0,0" VerticalAlignment="Top" Width="161" Maximum="50"/>
+        <Label x:Name="PasswordLabel1" Content="Strength" Margin="10,178,325,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontStyle="Italic"/>
+        <ProgressBar x:Name="PasswordStrengthBar" HorizontalAlignment="Left" Height="17" Margin="77,183,0,0" VerticalAlignment="Top" Width="158" Maximum="50"/>
 
     </Grid>
 </Window>
