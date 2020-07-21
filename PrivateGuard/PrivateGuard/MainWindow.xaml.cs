@@ -16,6 +16,8 @@ using PrivateGuard.PG_Windows;
 ██╔═══╝░██╔══██╗██║░╚████╔╝░██╔══██║░░░██║░░░██╔══╝░░  ██║░░╚██╗██║░░░██║██╔══██║██╔══██╗██║░░██║
 ██║░░░░░██║░░██║██║░░╚██╔╝░░██║░░██║░░░██║░░░███████╗  ╚██████╔╝╚██████╔╝██║░░██║██║░░██║██████╔╝
 ╚═╝░░░░░╚═╝░░╚═╝╚═╝░░░╚═╝░░░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝  ░╚═════╝░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░
+
+Created by Jacob Luvisi
  */
 
 namespace PrivateGuard
@@ -27,7 +29,7 @@ namespace PrivateGuard
     public partial class MainWindow : Window
     {
         private bool _showFileKeyField;
-        public static string VersionID = "1.0.2-BETA";
+        public static string VersionID = "1.0.2B2";
 
         public static readonly string SETTINGS_DIR =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
@@ -62,9 +64,8 @@ namespace PrivateGuard
         private void SetupPrimaryScreen()
         {
             var mw = this;
-            //mw.Title = "Private Guard | Version: " + VersionID;
             mw.VersionLabel.Content = "Version: " + VersionID;
-            //mw.WindowStyle = new WindowStyle {  }; // Make blank top bar.
+            
             OpenFileButton.BorderThickness = new Thickness(2.5);
             NewFileButton.BorderThickness = new Thickness(2.5);
             DocumentationButton.BorderThickness = new Thickness(2.5);
