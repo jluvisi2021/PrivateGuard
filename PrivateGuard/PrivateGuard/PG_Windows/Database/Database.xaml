@@ -82,7 +82,7 @@
 
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="ContactDevItem" Header="Contact Developer" InputGestureText="" Click="ContactDevItem_Click">
+                <MenuItem x:Name="ContactDevItem" Header="Report Issue" InputGestureText="" Click="ContactDevItem_Click">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Message_16x.png" />
 

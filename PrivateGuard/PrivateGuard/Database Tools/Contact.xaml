@@ -5,18 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrivateGuard.Database_Tools"
         mc:Ignorable="d"
-        Title="Contact Developer" Height="360" Width="510" ResizeMode="CanMinimize" Icon="PG_Shield_t.png" FontFamily="Trebuchet MS" FontSize="14">
+        Title="Contact Developer" Height="310" Width="510" ResizeMode="CanMinimize" Icon="PG_Shield_t.png" FontFamily="Trebuchet MS" FontSize="14">
     <Grid Background="#FFE1DCF0">
-        <Label x:Name="ContactTitle" Content="Contact Developer (Help)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="32" Width="216" FontWeight="Bold"/>
+        <Label x:Name="ContactTitle" Content="Contact Developer / Report Issue (Help)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="32" Width="440" FontWeight="Bold"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,33,0,0" TextWrapping="Wrap" Text="NOTE: Before using this method please make sure you have read the Q&amp;A and watched the Private Guard tutorial. (See Utilities -&gt; Help on the database page)" VerticalAlignment="Top" Height="24" Width="458" FontSize="10" FontStyle="Italic"/>
         <Separator HorizontalAlignment="Left" Height="18" Margin="10,62,0,0" VerticalAlignment="Top" Width="474"/>
-        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="409,301,0,0" VerticalAlignment="Top" Width="75" Height="20">
+        <Button x:Name="ReportButton" Content="Report Issue" HorizontalAlignment="Left" Margin="16,228,0,0" VerticalAlignment="Top" Width="138" Height="26" Click="ReportButton_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
+        <Label Content="Describe your issue in detail:" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" FontSize="12"/>
+        <TextBox x:Name="MainIssueTextBox" HorizontalAlignment="Left" Height="52" Margin="16,104,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="468" FontSize="12"/>
+        <Label Content="Does your problem prevent you from accessing your passwords?" HorizontalAlignment="Left" Margin="16,161,0,0" VerticalAlignment="Top" FontSize="12"/>
+        <CheckBox x:Name="CriticalIssue" Content="Yes, it does." HorizontalAlignment="Left" Margin="22,190,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

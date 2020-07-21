@@ -120,7 +120,7 @@ namespace PrivateGuard
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            string a;
+            string a = string.Empty;
             if (UsernameField.Text != Username)
             {
                 DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
@@ -141,54 +141,52 @@ namespace PrivateGuard
 
             var checkable = _showFileKeyField ? ViewPasswordTextBox.Text : FileKeyField.Password;
 
-            // try
-            // {
+
             a = SelectedFileField.Text;
-            var fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
-            var bw2 = new BinaryReader(fs2);
-            string modifierValue;
             try
             {
-                modifierValue = Cipher.Decrypt(bw2.ReadString(), checkable);
-            }
-            catch (Exception)
-            {
-                DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
+                var fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
+                var bw2 = new BinaryReader(fs2);
+                string modifierValue;
+                try
+                {
+                    modifierValue = Cipher.Decrypt(bw2.ReadString(), checkable);
+                }
+                catch (Exception)
+                {
+                    DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
+                    fs2.Close();
+                    bw2.Close();
+                    return;
+                }
+
+                if (modifierValue != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+                {
+                    DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
+                    fs2.Close();
+                    bw2.Close();
+                    return;
+                }
+
                 fs2.Close();
                 bw2.Close();
-                return;
-            }
 
-            //string data = bw2.ReadString();
-            if (modifierValue != "OKAY_TO_ACCESS_MODIFIER_VALUE")
+                Database db;
+                if (_showFileKeyField)
+                    db = new Database(a, checkable);
+                else
+                    db = new Database(a, checkable);
+                if (new FileInfo(SelectedFileField.Text).Length > 100000)
+                    MessageBox.Show(
+                        "Your file has exceeded the recommended file size limit (100KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!",
+                        "File Size Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                db.Show();
+                Close();
+            }
+            catch (FileNotFoundException)
             {
-                DisplayErrorMessage(ErrorTypes.WRONG_CREDENTIALS);
-                fs2.Close();
-                bw2.Close();
-                return;
+                DisplayErrorMessage(ErrorTypes.FILE_NOT_FOUND);
             }
-
-            fs2.Close();
-            bw2.Close();
-            //MessageBox.Show("ALL GOOD!");
-            Database db;
-            if (_showFileKeyField)
-                db = new Database(a, checkable);
-            else
-                db = new Database(a, checkable);
-            if (new FileInfo(SelectedFileField.Text).Length > 100000)
-                MessageBox.Show(
-                    "Your file has exceeded the reccomended file size limit (100KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!",
-                    "File Size Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            db.Show();
-            Close();
-            // All is good attempt to open file.
-            // } catch (Exception)
-            // {
-
-            //DisplayErrorMessage(ERROR_TYPES.FILE_NOT_FOUND);
-            //    return;
-            // }
         }
 
         /// <summary>
