@@ -1,7 +1,7 @@
 # PrivateGuard
  A C# based offline password manager for Windows.
  
- Downloads:
+ Downloads: (v1.0.1-BETA, Outdated, For up to date builds please download from the Github release area)
  1. http://www.mediafire.com/file/9ts2bm5mc1r6wz8/Private_Guard_%2528v1.0.1-BETA%2529.zip/file
  2. https://mega.nz/file/SQoXnAyC#2cJc01OiNHJzVAx18iLdICp8fIE1aDUu6Izz9ipbR-k
  3. https://drive.google.com/file/d/13jeSCTbu7UT-d_Gxda-ghNl_xUVbh_H_/view?usp=sharing
