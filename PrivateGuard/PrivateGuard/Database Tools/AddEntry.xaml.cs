@@ -1,5 +1,7 @@
 ﻿using PrivateGuard.PG_Windows;
 using System;
+using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 using System.Windows;
 
 namespace PrivateGuard.Database_Tools
@@ -32,6 +34,69 @@ namespace PrivateGuard.Database_Tools
                 DateTime.Today.ToShortDateString(), NotesField.Text);
             NewEntryObject = obj;
             Close();
+        }
+
+        private void PasswordField_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            var strength = 0;
+            for (var i = 0; i < PasswordField.Text.Length; i++)
+            {
+                if (char.IsNumber(PasswordField.Text.ToCharArray()[i]))
+                {
+                    strength += 4;
+                }else if (char.IsPunctuation(PasswordField.Text.ToCharArray()[i]))
+                {
+                    strength += 5;
+                }else if(char.IsUpper(PasswordField.Text.ToCharArray()[i]))
+
+                {
+                    strength += 3;
+                }
+                else
+                {
+                    strength += 2;
+                }
+                if (PasswordField.Text.Contains(PasswordField.Text.ToCharArray()[i].ToString()))
+                {
+                    var count = PasswordField.Text.Count(f => f == PasswordField.Text.ToCharArray()[i]);
+                    strength -= ((count / 2) - PasswordField.Text.Length / 16);
+                }
+            }
+
+            PasswordStrengthBar.Value = strength;
+           
+        }
+
+        private void PasswordField_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            var strength = 0;
+            for (var i = 0; i < PasswordField.Text.Length; i++)
+            {
+                if (char.IsNumber(PasswordField.Text.ToCharArray()[i]))
+                {
+                    strength += 4;
+                }
+                else if (char.IsPunctuation(PasswordField.Text.ToCharArray()[i]))
+                {
+                    strength += 5;
+                }
+                else if (char.IsUpper(PasswordField.Text.ToCharArray()[i]))
+
+                {
+                    strength += 3;
+                }
+                else
+                {
+                    strength += 2;
+                }
+                if (PasswordField.Text.Contains(PasswordField.Text.ToCharArray()[i].ToString()))
+                {
+                    var count = PasswordField.Text.Count(f => f == PasswordField.Text.ToCharArray()[i]);
+                    strength -= ((count / 2)-PasswordField.Text.Length/16);
+                }
+            }
+            PasswordStrengthBar.Value = strength;
+           
         }
     }
 }

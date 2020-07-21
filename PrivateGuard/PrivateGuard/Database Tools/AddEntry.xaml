@@ -19,7 +19,7 @@
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="PasswordField" HorizontalAlignment="Left" Height="25" Margin="10,153,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="225" FontFamily="Trebuchet MS" FontSize="14">
+        <TextBox x:Name="PasswordField" HorizontalAlignment="Left" Height="25" Margin="10,153,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="225" FontFamily="Trebuchet MS" FontSize="14" KeyDown="PasswordField_KeyDown" KeyUp="PasswordField_KeyUp">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="6"/>
@@ -42,6 +42,8 @@
             </Button.Resources>
 
         </Button>
+        <Label x:Name="PasswordLabel1" Content="Password Strength" Margin="10,176,323,0" VerticalAlignment="Top" FontSize="8" FontFamily="Trebuchet MS" FontStyle="Italic"/>
+        <ProgressBar x:Name="PasswordStrengthBar" HorizontalAlignment="Left" Height="17" Margin="88,178,0,0" VerticalAlignment="Top" Width="147" Maximum="50"/>
 
     </Grid>
 </Window>

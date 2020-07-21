@@ -10,7 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="299"/>
-            <ColumnDefinition x:Name="bitch" Width="301"/>
+            <ColumnDefinition x:Name="c1" Width="301"/>
         </Grid.ColumnDefinitions>
         <Rectangle Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="823" Fill="#FF434351" MouseDown="Rectangle_MouseDown" Margin="0,0,-220,0"/>
         <Label x:Name="ExitProgramLabel" Content="X" Margin="464,-9,-198,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="30" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
