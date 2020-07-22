@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -49,6 +51,7 @@ namespace PrivateGuard.PG_Windows
             SetIdleTimerValue();
             SetupInputBindings();
             _timer = new Timer(Tick, null, 5000, Timeout.Infinite);
+
         }
 
         /// <summary>
@@ -319,25 +322,71 @@ namespace PrivateGuard.PG_Windows
             // Split string on each of its lines.
             var cipherRawDataText = rawData.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             // Make it into a list for ease of access.
-
+            List<string> cipherRawDataTextAsList = cipherRawDataText.ToList();
             // Go through the now split array and parse out each of the values.
             // Use the substring to remove the control characters.
-            for (var i = 1; i < cipherRawDataText.Length; i += 5)
+            FetchPlainTextDataParallel(cipherRawDataTextAsList, _privateKey);
+            SortColumn(PasswordDB, 0);
+        }
+
+        /// <summary>
+        /// Sorts each value in data grid by ID.
+        /// Sorts them in order because they are put out of order in the file because
+        /// of Parallel for loops.
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        /// <param name="columnIndex"></param>
+        public void SortColumn(DataGrid dataGrid, int columnIndex)
+        {
+            var performSortMethod = typeof(DataGrid)
+                .GetMethod("PerformSort",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+
+            performSortMethod?.Invoke(dataGrid, new[] { dataGrid.Columns[columnIndex] });
+        }
+
+        /// <summary>
+        /// Decrypts all data in the cipherRawDataText.
+        /// </summary>
+        /// <param name="cipherRawDataText"></param>
+        /// <param name="key"></param>
+        private void FetchPlainTextDataParallel(List<string> cipherRawDataText, String key)
+        {
+            cipherRawDataText.RemoveAt(0);//Remove modifier value.
+            Parallel.For(0, cipherRawDataText.Count, (i, state) =>
             {
-                if (cipherRawDataText[i].Length == 0)
-                    break;
-                PasswordDB.Items.Add(new EntryObject(
-                    int.Parse(Cipher.Decrypt(cipherRawDataText[i].Substring(1, cipherRawDataText[i].Length - 1), _privateKey).Trim()),
-                    Cipher.Decrypt(cipherRawDataText[i + 1].Substring(1, cipherRawDataText[i + 1].Length - 1), _privateKey),
-                    Cipher.Decrypt(cipherRawDataText[i + 2].Substring(1, cipherRawDataText[i + 2].Length - 1), _privateKey),
-                    Cipher.Decrypt(cipherRawDataText[i + 3].Substring(1, cipherRawDataText[i + 3].Length - 1), _privateKey),
-                    Cipher.Decrypt(cipherRawDataText[i + 4].Substring(1, cipherRawDataText[i + 4].Length - 1), _privateKey)));
-            }
+                if (i % 5 == 0)
+                {
+                    try
+                    {
+                        string ID = Cipher.Decrypt(cipherRawDataText[i].Substring(1, cipherRawDataText[i].Length - 1),
+                            _privateKey).Trim();
+                        string username =
+                            Cipher.Decrypt(cipherRawDataText[i + 1].Substring(1, cipherRawDataText[i + 1].Length - 1),
+                                _privateKey);
+                        string password =
+                            Cipher.Decrypt(cipherRawDataText[i + 2].Substring(1, cipherRawDataText[i + 2].Length - 1),
+                                _privateKey);
+                        string date = Cipher.Decrypt(cipherRawDataText[i + 3].Substring(1, cipherRawDataText[i + 3].Length - 1),
+                            _privateKey);
+                        string notes =
+                            Cipher.Decrypt(cipherRawDataText[i + 4].Substring(1, cipherRawDataText[i + 4].Length - 1),
+                                _privateKey);
+                        PasswordDB.Items.Add(new EntryObject(int.Parse(ID), username, password, date, notes));
+
+                    }
+                    catch (Exception)
+                    {
+                        
+                    }
+                    
+                }
+            });
         }
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MessageBox.Show("Exit PrivateGuard?\nWould you like to save your changes?", "Exit", MessageBoxButton.YesNo, MessageBoxImage.Question) !=
+            if (MessageBox.Show("Exit PrivateGuard?\nWould you like to save your changes?\n(May take some time)", "Exit", MessageBoxButton.YesNo, MessageBoxImage.Question) !=
                 MessageBoxResult.Yes)
             {
                 Close();
@@ -490,6 +539,36 @@ namespace PrivateGuard.PG_Windows
         }
 
         /// <summary>
+        /// Instead of using a single-threaded for loop this method uses the built in
+        /// C# Parallel.For to compute the encryption for each line. The writing to
+        /// the file still needs to be done single-threaded however so this method
+        /// just encrypts the data.
+        ///
+        /// Each list has its own 5 values in it that contains the ID, Username,
+        /// Password, Date, and notes.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private IEnumerable<List<string>> ComputeEncryption(String key)
+        {
+            var identifierList = new List<List<string>>();
+            Parallel.For(0, PasswordDB.Items.Count, i =>
+            {
+                if (!(PasswordDB.Items[i] is EntryObject entry))
+                {
+                    return;
+                }
+                var subList = new List<string>();
+                subList.Add(Cipher.Encrypt(""+entry.ID, key));
+                subList.Add(Cipher.Encrypt("" + entry.Username, key));
+                subList.Add(Cipher.Encrypt("" + entry.Password, key));
+                subList.Add(Cipher.Encrypt("" + entry.Date, key));
+                subList.Add(Cipher.Encrypt("" + entry.Notes, key));
+                identifierList.Add(subList);
+            });
+            return identifierList;
+        }
+        /// <summary>
         /// Saves all entries and writes them to a file using the encryption.
         /// </summary>
         /// <see cref="Cipher"/>
@@ -497,7 +576,6 @@ namespace PrivateGuard.PG_Windows
         /// <param name="e"></param>
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
-
             var filePath = Filename;
             try
             {
@@ -517,25 +595,21 @@ namespace PrivateGuard.PG_Windows
             {
                 bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", _privateKey));
                 bw.Write(Environment.NewLine);
-
-                for (var i = 0; i < PasswordDB.Items.Count; i++)
+                
+                foreach(var list in ComputeEncryption(_privateKey))
                 {
-                    if (!(PasswordDB.Items[i] is EntryObject temp))
-                    {
-                        return;
-                    }
-                    // Write each value on a different line.
-                    bw.Write(Cipher.Encrypt("" + i, _privateKey));
+                    bw.Write(list[0]);
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Username, _privateKey));
+                    bw.Write(list[1]);
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Password, _privateKey));
+                    bw.Write(list[2]);
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Date, _privateKey));
+                    bw.Write(list[3]);
                     bw.Write(Environment.NewLine);
-                    bw.Write(Cipher.Encrypt(temp.Notes, _privateKey));
+                    bw.Write(list[4]);
                     bw.Write(Environment.NewLine);
                 }
+
             }
             catch (Exception)
             {
@@ -550,8 +624,9 @@ namespace PrivateGuard.PG_Windows
                 fs.Close();
                 bw.Close();
             }
-
+           
             MessageBox.Show("Database Saved & Encrypted", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            
         }
 
         private void ExitItem_Click(object sender, RoutedEventArgs e)
@@ -561,6 +636,8 @@ namespace PrivateGuard.PG_Windows
             {
                 return;
             }
+
+            _timer.Dispose();
             var mw = new MainWindow();
             mw.Show();
             Close();
@@ -695,11 +772,13 @@ namespace PrivateGuard.PG_Windows
             // Getting all Control from list
             var lstControl = lstElement.OfType<Control>();
 
-            foreach (var control in lstControl)
+            foreach (var control in lstControl) 
+                
                 // If the control is not the minimize or exit function.
                 if (!control.Name.Contains("Program"))
                     //Hide all Controls
-                    control.FontFamily = new FontFamily(font);
+                    control.FontFamily = new FontFamily(font);  
+           
         }
 
         private void SubFontTimesNewRomanItem_Click(object sender, RoutedEventArgs e)
@@ -946,22 +1025,17 @@ namespace PrivateGuard.PG_Windows
             bw.Write(Cipher.Encrypt("OKAY_TO_ACCESS_MODIFIER_VALUE", specifiedKey));
             bw.Write(Environment.NewLine);
             // Write each object on a different line
-            for (var i = 0; i < PasswordDB.Items.Count; i++)
+            foreach (List<string> list in ComputeEncryption(specifiedKey))
             {
-                if (!(PasswordDB.Items[i] is EntryObject temp))
-                {
-                    return;
-                }
-
-                bw.Write(Cipher.Encrypt("" + i, specifiedKey));
+                bw.Write(list[0]);
                 bw.Write(Environment.NewLine);
-                bw.Write(Cipher.Encrypt(temp.Username, specifiedKey));
+                bw.Write(list[1]);
                 bw.Write(Environment.NewLine);
-                bw.Write(Cipher.Encrypt(temp.Password, specifiedKey));
+                bw.Write(list[2]);
                 bw.Write(Environment.NewLine);
-                bw.Write(Cipher.Encrypt(temp.Date, specifiedKey));
+                bw.Write(list[3]);
                 bw.Write(Environment.NewLine);
-                bw.Write(Cipher.Encrypt(temp.Notes, specifiedKey));
+                bw.Write(list[4]);
                 bw.Write(Environment.NewLine);
             }
 

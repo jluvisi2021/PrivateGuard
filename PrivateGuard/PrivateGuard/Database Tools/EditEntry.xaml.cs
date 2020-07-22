@@ -69,7 +69,7 @@ namespace PrivateGuard.Database_Tools
                 if (PasswordField.Text.Contains(PasswordField.Text.ToCharArray()[i].ToString()))
                 {
                     var count = PasswordField.Text.Count(f => f == PasswordField.Text.ToCharArray()[i]);
-                    strength -= ((count / 2) - PasswordField.Text.Length / 16);
+                    strength -= ((count / 2) - PasswordField.Text.Length / 14);
                 }
             }
 
@@ -102,7 +102,7 @@ namespace PrivateGuard.Database_Tools
                 if (PasswordField.Text.Contains(PasswordField.Text.ToCharArray()[i].ToString()))
                 {
                     var count = PasswordField.Text.Count(f => f == PasswordField.Text.ToCharArray()[i]);
-                    strength -= ((count / 2) - PasswordField.Text.Length / 16);
+                    strength -= ((count / 2) - PasswordField.Text.Length / 14);
                 }
             }
             PasswordStrengthBar.Value = strength;

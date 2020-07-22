@@ -180,6 +180,5 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>
-        <Label x:Name="AutoSaveLabel" Content="" Grid.Column="2" HorizontalAlignment="Left" Margin="256,30,-157,0" VerticalAlignment="Top" Width="203"/>
-    </Grid>
+        </Grid>
 </Window>

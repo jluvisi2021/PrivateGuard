@@ -1,6 +1,5 @@
 ﻿using PrivateGuard.PG_Windows;
 using System;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Windows;
 
