@@ -205,26 +205,31 @@ namespace PrivateGuard.PG_Windows
             if (raw.Contains("Times New Roman"))
             {
                 ChangeGlobalFont("Times New Roman");
+                App.Font = "Times New Roman";
                 SubFontTimesNewRomanItem.IsChecked = true;
             }
             else if (raw.Contains("Courier"))
             {
                 ChangeGlobalFont("Courier");
+                App.Font = "Courier";
                 SubFontCourierItem.IsChecked = true;
             }
             else if (raw.Contains("Trebuchet MS"))
             {
                 ChangeGlobalFont("Trebuchet MS");
+                App.Font = "Trebuchet MS";
                 SubFontTrebuchetMSItem.IsChecked = true;
             }
             else if (raw.Contains("Arial"))
             {
                 ChangeGlobalFont("Arial");
+                App.Font = "Arial";
                 SubFontArialItem.IsChecked = true;
             }
             else if (raw.Contains("Calibri"))
             {
                 ChangeGlobalFont("Calibri");
+                App.Font = "Calibri";
                 SubFontCalibriItem.IsChecked = true;
             }
             else
@@ -233,6 +238,7 @@ namespace PrivateGuard.PG_Windows
                     "Could not read font type from settings file.\nThe program will still work but Settings will not be saved.\nIf you continue to get this error then try running the program as administrator or regenerate the settings file (See Utilities -> Help).",
                     "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 ChangeGlobalFont("Trebuchet MS");
+                App.Font = "Trebuchet MS";
                 SubFontTrebuchetMSItem.IsChecked = true;
             }
         }
@@ -772,13 +778,14 @@ namespace PrivateGuard.PG_Windows
             // Getting all Control from list
             var lstControl = lstElement.OfType<Control>();
 
+            App.Font = font;
             foreach (var control in lstControl) 
                 
                 // If the control is not the minimize or exit function.
                 if (!control.Name.Contains("Program"))
                     //Hide all Controls
-                    control.FontFamily = new FontFamily(font);  
-           
+                    control.FontFamily = new FontFamily(font);
+
         }
 
         private void SubFontTimesNewRomanItem_Click(object sender, RoutedEventArgs e)

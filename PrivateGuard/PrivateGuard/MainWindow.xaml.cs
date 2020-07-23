@@ -181,9 +181,9 @@ namespace PrivateGuard
                     db = new Database(a, checkable);
                 else
                     db = new Database(a, checkable);
-                if (new FileInfo(SelectedFileField.Text).Length > 100000)
+                if (new FileInfo(SelectedFileField.Text).Length > 500000)
                     MessageBox.Show(
-                        "Your file has exceeded the recommended file size limit (100KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!",
+                        "Your file has exceeded the recommended file size limit (500KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!",
                         "File Size Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 db.Show();
                 Close();

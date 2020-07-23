@@ -2,6 +2,8 @@
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace PrivateGuard.Database_Tools
 {
@@ -18,6 +20,31 @@ namespace PrivateGuard.Database_Tools
         {
             _rowCount = rowCount;
             InitializeComponent();
+            ChangeGlobalFont(App.Font);
+        }
+
+        private void ChangeGlobalFont(string font)
+        {
+            // casting the content into panel
+            var mainContainer = (Panel)Content;
+
+            // GetAll UIElement
+            var element = mainContainer.Children;
+
+            // casting the UIElementCollection into List
+            var lstElement = element.Cast<FrameworkElement>().ToList();
+
+            // Getting all Control from list
+            var lstControl = lstElement.OfType<Control>();
+
+            App.Font = font;
+            foreach (var control in lstControl)
+
+                // If the control is not the minimize or exit function.
+                if (!control.Name.Contains("Program"))
+                    //Hide all Controls
+                    control.FontFamily = new FontFamily(font);
+
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
