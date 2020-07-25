@@ -33,6 +33,7 @@ namespace PrivateGuard.PG_Windows
         private const int CheckInterval = 60 * 1000;
         private readonly string _privateKey;
         private bool _isIdleTimerEnabled = true;
+        private bool _isAutoSaveEnabled = false;
         private readonly CancellationTokenSource _token = new CancellationTokenSource();
         private readonly double[] _mousePosition = new double[2];
         private readonly double[] _mousePositionOld = { 0.0, 0.0 };
@@ -49,9 +50,10 @@ namespace PrivateGuard.PG_Windows
             GetSettingsFont(File.ReadAllText(MainWindow.SETTINGS_DIR));
             GetSettingsFontSize();
             SetIdleTimerValue();
+            SetAutoSaveValue();
             SetupInputBindings();
             _timer = new Timer(Tick, null, 5000, Timeout.Infinite);
-
+            
         }
 
         /// <summary>
@@ -72,6 +74,30 @@ namespace PrivateGuard.PG_Windows
             _isIdleTimerEnabled = false;
             DisableIdleTimerItem.Header = "Enable Idle Timer";
         }
+
+        public void SetAutoSaveValue()
+        {
+            // Idle timer is on.
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var rawSettingsData = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+            if (rawSettingsData[6].Contains("Disabled"))
+            {
+                return;
+            }
+            if (new FileInfo(Filename).Length > 500000)
+            {
+                MessageBox.Show(
+                    "Your file has exceeded the maximum recommended size of 500KB, therefore auto save has been turned off! To enable autosave shrink your file.",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Stop);
+                _isAutoSaveEnabled = false;
+                EnableAutoSave.Header = "Enable Auto Save";
+                return;
+            }
+            _isAutoSaveEnabled = true;
+            EnableAutoSave.Header = "Disable Auto Save";
+        }
+
 
         /// <summary>
         /// Setup keyboard short cuts for each Item Menu
@@ -243,11 +269,24 @@ namespace PrivateGuard.PG_Windows
             }
         }
 
-
+        private int count = 0;
         private void Tick(object state)
         {
             try
             {
+                if (_isAutoSaveEnabled)
+                {
+                    // Save around every 4 minutes
+                    ++count;
+
+                    if (count / 50 == 0)
+                    {
+
+                        SaveItem_Click(null, null);
+                    }
+
+                    count = 0;
+                }
                 if (!_isIdleTimerEnabled) return;
 
                 // If the mouse position is not in the exact same spot as the last check...
@@ -1071,6 +1110,41 @@ namespace PrivateGuard.PG_Windows
                     break;
                 default:
                     return;
+            }
+        }
+
+        private void EnableAutoSave_Click(object sender, RoutedEventArgs e)
+        {
+            if (new FileInfo(Filename).Length > 500000 && _isAutoSaveEnabled == false)
+            {
+                MessageBox.Show(
+                    "Your file has exceeded the maximum recommended size of 500KB, therefore auto save cannot be enabled! To enable autosave shrink your file.",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Stop);
+                return;
+            }
+            _isAutoSaveEnabled = !_isAutoSaveEnabled;
+            var menuItem = (MenuItem)e.OriginalSource;
+            if (_isAutoSaveEnabled)
+            {
+                menuItem.Header = "Disable Auto Save";
+
+                var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                b[6] = "AUTO_SAVE: Enabled";
+                var newText = string.Empty;
+                foreach (var s in b) newText += s + Environment.NewLine;
+                File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
+            }
+            else
+            {
+                menuItem.Header = "Enable Auto Save";
+                
+                var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                b[6] = "AUTO_SAVE: Disabled";
+                var newText = string.Empty;
+                foreach (var s in b) newText += s + Environment.NewLine;
+                File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
             }
         }
     }

@@ -266,5 +266,8 @@
   <ItemGroup>
     <Resource Include="PG_Shield_t_70.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Save_grey_16x.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

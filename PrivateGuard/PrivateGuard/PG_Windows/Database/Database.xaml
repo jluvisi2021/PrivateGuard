@@ -95,6 +95,11 @@
                         <Image Source="/Resources/Timer_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem x:Name="EnableAutoSave" Header="Enable Auto Save" InputGestureText="" Click="EnableAutoSave_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Save_grey_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem x:Name="FontItem" Header="Font" InputGestureText="">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Font_16x.png" />
@@ -180,5 +185,6 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>
-        </Grid>
+        <Label x:Name="AutoSaveNotif" Visibility="Visible" Content="AutoSave: Saving in 5 seconds..." Grid.Column="2" HorizontalAlignment="Left" Margin="167,2,-66,0" VerticalAlignment="Top" Width="201"/>
+    </Grid>
 </Window>
