@@ -81,8 +81,11 @@ namespace PrivateGuard.PG_Windows
             }
             catch (Exception)
             {
-                MessageBox.Show("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nCRITICAL ERROR STARTING APPLICATION.\nWe have detected that you are running version 1.0.6 or greater.\nWe were unable to find the values for font colors in the local settings file.\nThis may be because you have just upgraded from an older version.\n If this is the case please regenerate your settings file by deleting \"settings.bin\" at " + MainWindow.SETTINGS_DIR + ".\nTo read more visit: https://github.com/jluvisi2021/PrivateGuard/wiki \nThe Application will not start until this issue is solved.\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "Critical Error.", MessageBoxButton.OK, MessageBoxImage.Stop);
+                // Stop auto save or idle timer popups from showing.
+                _isAutoSaveEnabled = false;
+                _isIdleTimerEnabled = false;
                 Close();
+                MessageBox.Show("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nCRITICAL ERROR STARTING APPLICATION.\nWe have detected that you are running version 1.0.6 or greater.\nWe were unable to find the values for font colors in the local settings file.\nThis may be because you have just upgraded from an older version.\n If this is the case please regenerate your settings file by deleting \"settings.bin\" at " + MainWindow.SETTINGS_DIR + ".\nTo read more visit: https://github.com/jluvisi2021/PrivateGuard/wiki \nThe Application will not start until this issue is solved.\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "Critical Error.", MessageBoxButton.OK, MessageBoxImage.Stop);
             }
 
         }

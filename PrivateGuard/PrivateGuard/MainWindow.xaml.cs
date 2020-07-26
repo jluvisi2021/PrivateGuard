@@ -138,7 +138,7 @@ namespace PrivateGuard
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            string a = string.Empty;
+            var a = string.Empty;
 
             if (string.IsNullOrWhiteSpace(FileKeyField.Password))
             {
