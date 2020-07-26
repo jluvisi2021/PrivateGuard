@@ -1,0 +1,96 @@
+﻿<Window x:Class="PrivateGuard.Database_Tools.ColorTheme"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PrivateGuard.Database_Tools"
+        mc:Ignorable="d"
+        Title="ColorTheme" Height="370" Width="510" ResizeMode="CanMinimize" Icon="/PrivateGuard;component/Resources/ColorWheel_16x.png">
+    <Grid>
+        <Label x:Name="Title1" Content="Pick an RGB Value for the global text (Font)" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Separator HorizontalAlignment="Left" Height="13" Margin="10,41,0,0" VerticalAlignment="Top" Width="474"/>
+        <Label x:Name="Title2" Content="Pick an RGB Value for the Database background" HorizontalAlignment="Left" Margin="10,144,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Separator HorizontalAlignment="Left" Height="13" Margin="10,178,0,0" VerticalAlignment="Top" Width="474"/>
+        <Label x:Name="R" Content="R" HorizontalAlignment="Left" Margin="10,59,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label x:Name="G" Content="G" HorizontalAlignment="Left" Margin="9,85,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label x:Name="B" Content="B" HorizontalAlignment="Left" Margin="9,111,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label x:Name="R1" Content="R" HorizontalAlignment="Left" Margin="10,196,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label x:Name="G1" Content="G" HorizontalAlignment="Left" Margin="10,222,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label x:Name="B1" Content="B" HorizontalAlignment="Left" Margin="11,248,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Separator HorizontalAlignment="Left" Height="13" Margin="9,274,0,0" VerticalAlignment="Top" Width="474"/>
+        <Button x:Name="SubmitButton" Content="Submit" HorizontalAlignment="Left" Margin="306,292,0,0" VerticalAlignment="Top" Width="82" Height="29" FontSize="14" Click="SubmitButton_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button x:Name="CancelButton" Content="Exit" HorizontalAlignment="Left" Margin="402,292,0,0" VerticalAlignment="Top" Width="82" Height="29" FontSize="14" Click="CancelButton_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Separator HorizontalAlignment="Left" Height="8" Margin="170,229,0,0" VerticalAlignment="Top" Width="98" RenderTransformOrigin="0.5,0.5">
+            <Separator.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="270"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Separator.RenderTransform>
+        </Separator>
+        <Separator HorizontalAlignment="Left" Height="10" Margin="171,90,0,0" VerticalAlignment="Top" Width="96" RenderTransformOrigin="0.5,0.5">
+            <Separator.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="270"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Separator.RenderTransform>
+        </Separator>
+        <Separator HorizontalAlignment="Left" Height="13" Margin="9,137,0,0" VerticalAlignment="Top" Width="474"/>
+        <Label x:Name="ExampleText1" Content="The quick brown fox jumps over the lazy dog" HorizontalAlignment="Left" Margin="226,54,0,0" VerticalAlignment="Top" Width="258"/>
+        <Label x:Name="ExampleText3" Content="The quick brown fox jumps over the lazy dog" HorizontalAlignment="Left" Margin="226,106,0,0" VerticalAlignment="Top" Width="268" FontWeight="Bold"/>
+        <Label x:Name="ExampleText2" Content="The quick brown fox jumps over the lazy dog" HorizontalAlignment="Left" Margin="226,80,0,0" VerticalAlignment="Top" Width="257" FontStyle="Italic"/>
+        <Label x:Name="ExampleText4" Content="The quick brown fox jumps over the lazy dog" HorizontalAlignment="Left" Margin="225,191,0,0" VerticalAlignment="Top" Width="258"/>
+        <Label x:Name="ExampleText5" Content="The quick brown fox jumps over the lazy dog" HorizontalAlignment="Left" Margin="225,217,0,0" VerticalAlignment="Top" Width="257" FontStyle="Italic"/>
+        <Label x:Name="ExampleText6" Content="The quick brown fox jumps over the lazy dog" HorizontalAlignment="Left" Margin="225,243,0,0" VerticalAlignment="Top" Width="268" FontWeight="Bold"/>
+        <TextBox x:Name="RedValueFont" HorizontalAlignment="Left" Height="17" Margin="33,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" KeyDown="RedValueFont_KeyDown"/>
+        <TextBox x:Name="GreenValueFont" HorizontalAlignment="Left" Height="17" Margin="33,89,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" KeyDown="GreenValueFont_KeyDown"/>
+        <TextBox x:Name="BlueValueFont" HorizontalAlignment="Left" Height="17" Margin="33,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" KeyDown="BlueValueFont_KeyDown"/>
+        <TextBox x:Name="RedValueDatabase" HorizontalAlignment="Left" Height="17" Margin="33,200,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" KeyDown="RedValueDatabase_KeyDown"/>
+        <TextBox x:Name="GreenValueDatabase" HorizontalAlignment="Left" Height="17" Margin="33,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" KeyDown="GreenValueDatabase_KeyDown"/>
+        <TextBox x:Name="BlueValueDatabase" HorizontalAlignment="Left" Height="17" Margin="33,252,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="32" KeyDown="BlueValueDatabase_KeyDown"/>
+        <Button x:Name="IncreaseRedFontButton" Content="+" HorizontalAlignment="Left" Margin="70,62,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="IncreaseRedFontButton_Click"/>
+        <Button x:Name="DecreaseRedFontButton" Content="-" HorizontalAlignment="Left" Margin="95,62,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="DecreaseRedFontButton_Click"/>
+        <Button x:Name="IncreaseGreenFontButton" Content="+" HorizontalAlignment="Left" Margin="70,88,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="IncreaseGreenFontButton_Click"/>
+        <Button x:Name="IncreaseBlueFontButton" Content="+" HorizontalAlignment="Left" Margin="70,114,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="IncreaseBlueFontButton_Click"/>
+        <Button x:Name="DecreaseGreenFontButton" Content="-" HorizontalAlignment="Left" Margin="95,88,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="DecreaseGreenFontButton_Click"/>
+        <Button x:Name="DecreaseBlueFontButton" Content="-" HorizontalAlignment="Left" Margin="95,114,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="DecreaseBlueFontButton_Click"/>
+        <Button x:Name="IncreaseRedDatabaseButton" Content="+" HorizontalAlignment="Left" Margin="70,200,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="IncreaseRedDatabaseButton_Click"/>
+        <Button x:Name="IncreaseGreenDatabaseButton" Content="+" HorizontalAlignment="Left" Margin="70,225,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="IncreaseGreenDatabaseButton_Click"/>
+        <Button x:Name="IncreaseBlueDatabaseButton" Content="+" HorizontalAlignment="Left" Margin="70,251,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="IncreaseBlueDatabaseButton_Click"/>
+        <Button x:Name="DecreaseRedDatabaseButton" Content="-" HorizontalAlignment="Left" Margin="95,200,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="DecreaseRedDatabaseButton_Click"/>
+        <Button x:Name="DecreaseGreenDatabaseButton" Content="-" HorizontalAlignment="Left" Margin="95,225,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="DecreaseGreenDatabaseButton_Click"/>
+        <Button x:Name="DecreaseBlueDatabaseButton" Content="-" HorizontalAlignment="Left" Margin="95,251,0,0" VerticalAlignment="Top" Width="20" Height="18" Click="DecreaseBlueDatabaseButton_Click"/>
+        <Button x:Name="ResetDatabaseToDefault" Content="Reset" HorizontalAlignment="Left" Margin="137,254,0,0" VerticalAlignment="Top" Width="75" Click="ResetDatabaseToDefault_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button x:Name="ResetFontToDefault" Content="Reset" HorizontalAlignment="Left" Margin="137,119,0,0" VerticalAlignment="Top" Width="75" Click="ResetFontToDefault_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+
+    </Grid>
+</Window>
