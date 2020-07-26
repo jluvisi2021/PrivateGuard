@@ -156,6 +156,11 @@
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
+                <MenuItem x:Name="ChangeThemeItem" Header="Change Color Theme" IsCheckable="False" StaysOpenOnClick="True" Click="ChangeThemeItem_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/ColorWheel_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <Label x:Name="EditingLabel" Grid.ColumnSpan="2" Content="Editing: " HorizontalAlignment="Left" Margin="203.333,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="329" Grid.Column="1"/>
@@ -185,6 +190,5 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>
-        <Label x:Name="AutoSaveNotif" Visibility="Visible" Content="AutoSave: Saving in 5 seconds..." Grid.Column="2" HorizontalAlignment="Left" Margin="167,2,-66,0" VerticalAlignment="Top" Width="201"/>
     </Grid>
 </Window>

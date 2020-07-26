@@ -26,6 +26,7 @@ namespace PrivateGuard.Database_Tools
             EditTitle.Content = "Editing... ID: " + Entry.ID;
             PasswordField_KeyDown(null, null);
             ChangeGlobalFont(App.Font);
+            App.ChangeGlobalFontColor((Panel)Content);
         }
 
         private void ChangeGlobalFont(string font)

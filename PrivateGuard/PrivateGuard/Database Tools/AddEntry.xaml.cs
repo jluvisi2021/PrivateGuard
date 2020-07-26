@@ -21,7 +21,10 @@ namespace PrivateGuard.Database_Tools
             _rowCount = rowCount;
             InitializeComponent();
             ChangeGlobalFont(App.Font);
+
+            App.ChangeGlobalFontColor((Panel)Content);
         }
+
 
         private void ChangeGlobalFont(string font)
         {

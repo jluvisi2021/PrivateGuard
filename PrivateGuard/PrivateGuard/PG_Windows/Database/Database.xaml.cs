@@ -24,8 +24,6 @@ namespace PrivateGuard.PG_Windows
     /// </summary>
     /// 
 
-    //TODO: Have trebuchet checked in fonts by default.
-    // dont allow users to select more than one font.
     public partial class Database
     {
         private int _selectedEntry = -1;
@@ -53,7 +51,40 @@ namespace PrivateGuard.PG_Windows
             SetAutoSaveValue();
             SetupInputBindings();
             _timer = new Timer(Tick, null, 5000, Timeout.Infinite);
-            
+            SetupTheme();
+        }
+
+        public void SetupTheme()
+        {
+            try
+            {
+                var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                var rawSettingsData = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+                var fRed = byte.Parse(rawSettingsData[8]);
+                var fGreen = byte.Parse(rawSettingsData[9]);
+                var fBlue = byte.Parse(rawSettingsData[10]);
+                var dRed = byte.Parse(rawSettingsData[11]);
+                var dGreen = byte.Parse(rawSettingsData[12]);
+                var dBlue = byte.Parse(rawSettingsData[13]);
+
+                App.FontColor.R = fRed;
+                App.FontColor.G = fGreen;
+                App.FontColor.B = fBlue;
+                App.DatabaseColor.R = dRed;
+                App.DatabaseColor.G = dGreen;
+                App.DatabaseColor.B = dBlue;
+
+                App.ChangeGlobalFontColor((Panel)Content);
+                ChangeDatabaseColor();
+
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nCRITICAL ERROR STARTING APPLICATION.\nWe have detected that you are running version 1.0.6 or greater.\nWe were unable to find the values for font colors in the local settings file.\nThis may be because you have just upgraded from an older version.\n If this is the case please regenerate your settings file by deleting \"settings.bin\" at " + MainWindow.SETTINGS_DIR + ".\nTo read more visit: https://github.com/jluvisi2021/PrivateGuard/wiki \nThe Application will not start until this issue is solved.\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "Critical Error.", MessageBoxButton.OK, MessageBoxImage.Stop);
+                Close();
+            }
+
         }
 
         /// <summary>
@@ -269,7 +300,7 @@ namespace PrivateGuard.PG_Windows
             }
         }
 
-        private int count = 0;
+        private int _count = 0;
         private void Tick(object state)
         {
             try
@@ -277,15 +308,15 @@ namespace PrivateGuard.PG_Windows
                 if (_isAutoSaveEnabled)
                 {
                     // Save around every 4 minutes
-                    ++count;
+                    ++_count;
 
-                    if (count / 50 == 0)
+                    if (_count / 50 == 0)
                     {
 
                         SaveItem_Click(null, null);
                     }
 
-                    count = 0;
+                    _count = 0;
                 }
                 if (!_isIdleTimerEnabled) return;
 
@@ -603,12 +634,14 @@ namespace PrivateGuard.PG_Windows
                 {
                     return;
                 }
-                var subList = new List<string>();
-                subList.Add(Cipher.Encrypt(""+entry.ID, key));
-                subList.Add(Cipher.Encrypt("" + entry.Username, key));
-                subList.Add(Cipher.Encrypt("" + entry.Password, key));
-                subList.Add(Cipher.Encrypt("" + entry.Date, key));
-                subList.Add(Cipher.Encrypt("" + entry.Notes, key));
+                var subList = new List<string>
+                {
+                    Cipher.Encrypt("" + entry.ID, key),
+                    Cipher.Encrypt("" + entry.Username, key),
+                    Cipher.Encrypt("" + entry.Password, key),
+                    Cipher.Encrypt("" + entry.Date, key),
+                    Cipher.Encrypt("" + entry.Notes, key)
+                };
                 identifierList.Add(subList);
             });
             return identifierList;
@@ -826,6 +859,7 @@ namespace PrivateGuard.PG_Windows
                     control.FontFamily = new FontFamily(font);
 
         }
+
 
         private void SubFontTimesNewRomanItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1147,6 +1181,21 @@ namespace PrivateGuard.PG_Windows
                 File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
             }
         }
+
+        private void ChangeThemeItem_Click(object sender, RoutedEventArgs e)
+        {
+            // Opens a new window where a user can pick an RGB value for the text and an RGB value for the database background.
+            var colorThemeWindow = new ColorTheme();
+            colorThemeWindow.ShowDialog();
+            ChangeDatabaseColor();
+            App.ChangeGlobalFontColor((Panel)Content);
+        }
+        private void ChangeDatabaseColor()
+        {
+            PasswordDB.RowBackground = new SolidColorBrush(App.DatabaseColor);
+        }
+            
+        
     }
 
     public class EntryObject : ICloneable

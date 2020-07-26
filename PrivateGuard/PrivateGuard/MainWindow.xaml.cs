@@ -29,7 +29,7 @@ namespace PrivateGuard
     public partial class MainWindow : Window
     {
         private bool _showFileKeyField;
-        public static string VersionID = "1.0.5";
+        public static string VersionID = "1.0.6";
 
         public static readonly string SETTINGS_DIR =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
@@ -53,7 +53,14 @@ namespace PrivateGuard
                     "IDLE_TIMER: Enabled",
                     "GLOBAL_FONT: Trebuchet MS",
                     "FONT_SIZE: 12px",
-                    "AUTO_SAVE: Disabled"
+                    "AUTO_SAVE: Disabled",
+                    "Custom Color Data: (RGB)",
+                    "0",
+                    "0",
+                    "0",
+                    "240",
+                    "240",
+                    "240"
                 };
                 File.WriteAllLines(appdata + "\\PrivateGuard\\settings.bin", testing);
             }
@@ -177,11 +184,8 @@ namespace PrivateGuard
                 fs2.Close();
                 bw2.Close();
 
-                Database db;
-                if (_showFileKeyField)
-                    db = new Database(a, checkable);
-                else
-                    db = new Database(a, checkable);
+                Database db = new Database(a, checkable);
+
                 if (new FileInfo(SelectedFileField.Text).Length > 500000)
                     MessageBox.Show(
                         "Your file has exceeded the recommended file size limit (500KB).\nAlthough there is no limit to the file size in Private Guard, you may experience slow downs when trying to perform certain actions!",

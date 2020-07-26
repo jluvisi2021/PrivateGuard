@@ -99,6 +99,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Database Tools\ColorTheme.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Database Tools\Contact.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -126,6 +130,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Database Tools\ColorTheme.xaml.cs">
+      <DependentUpon>ColorTheme.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database Tools\Contact.xaml.cs">
       <DependentUpon>Contact.xaml</DependentUpon>
@@ -268,6 +275,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Save_grey_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ColorWheel_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Database Tools\ColorWheel_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
