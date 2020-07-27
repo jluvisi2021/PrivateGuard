@@ -29,7 +29,7 @@ namespace PrivateGuard
     public partial class MainWindow : Window
     {
         private bool _showFileKeyField;
-        public static string VersionID = "1.0.6";
+        public static string VersionID = "1.1.0 Beta";
 
         public static readonly string SETTINGS_DIR =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
@@ -60,7 +60,8 @@ namespace PrivateGuard
                     "0",
                     "240",
                     "240",
-                    "240"
+                    "240",
+                    "Dark Theme: Disabled"
                 };
                 File.WriteAllLines(appdata + "\\PrivateGuard\\settings.bin", testing);
             }
@@ -98,7 +99,13 @@ namespace PrivateGuard
 
         private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            DragMove();
+            try
+            {
+                DragMove();
+            }
+            catch (InvalidOperationException)
+            { // Ignore wrong mouse click.
+            }
         }
 
         private void ToggleViewButton_Click(object sender, RoutedEventArgs e)
@@ -193,7 +200,7 @@ namespace PrivateGuard
                 db.Show();
                 Close();
             }
-            catch (Exception)
+            catch (FileNotFoundException)
             {
                 DisplayErrorMessage(ErrorTypes.FILE_NOT_FOUND);
             }

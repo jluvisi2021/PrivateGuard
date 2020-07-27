@@ -27,6 +27,7 @@ namespace PrivateGuard.Database_Tools
             PasswordField_KeyDown(null, null);
             ChangeGlobalFont(App.Font);
             App.ChangeGlobalFontColor((Panel)Content);
+            App.CheckForDarkMode((Panel)Content);
         }
 
         private void ChangeGlobalFont(string font)

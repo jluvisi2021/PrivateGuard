@@ -23,8 +23,8 @@ namespace PrivateGuard.Database_Tools
             ChangeGlobalFont(App.Font);
 
             App.ChangeGlobalFontColor((Panel)Content);
+            App.CheckForDarkMode((Panel)Content);
         }
-
 
         private void ChangeGlobalFont(string font)
         {

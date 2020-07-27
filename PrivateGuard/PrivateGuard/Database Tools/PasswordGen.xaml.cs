@@ -26,6 +26,7 @@ namespace PrivateGuard.Database_Tools
             PasswordLengthSlider.Maximum = 256;
             ChangeGlobalFont(App.Font);
             App.ChangeGlobalFontColor((Panel)Content);
+            App.CheckForDarkMode((Panel)Content);
         }
 
         private void ChangeGlobalFont(string font)

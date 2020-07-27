@@ -16,6 +16,7 @@ namespace PrivateGuard.Database_Tools
             InitializeComponent();
             ChangeGlobalFont(App.Font);
             App.ChangeGlobalFontColor((Panel)Content);
+            App.CheckForDarkMode((Panel)Content);
         }
 
         private void ChangeGlobalFont(string font)

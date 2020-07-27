@@ -61,7 +61,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+        <Style x:Key="DarkColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Background" Value="#FF414141" />
+        </Style>
     </Application.Resources>
     
 </Application>

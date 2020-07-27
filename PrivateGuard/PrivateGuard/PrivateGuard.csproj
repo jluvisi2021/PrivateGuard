@@ -28,8 +28,8 @@
     <ProductName>Private Guard</ProductName>
     <PublisherName>Jacob LuVisi</PublisherName>
     <SuiteName>Jacob LuVisi</SuiteName>
-    <ApplicationRevision>3</ApplicationRevision>
-    <ApplicationVersion>1.0.0.3</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.7.0</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -281,6 +281,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Database Tools\ColorWheel_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DarkTheme_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

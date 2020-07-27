@@ -12,7 +12,7 @@
             <ColumnDefinition Width="299"/>
             <ColumnDefinition x:Name="c1" Width="301"/>
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="823" Fill="#FF434351" MouseDown="Rectangle_MouseDown" Margin="0,0,-220,0"/>
+        <Rectangle x:Name="RECT" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="28" Stroke="#FF555569" VerticalAlignment="Top" Width="823" Fill="#FF434351" MouseDown="Rectangle_MouseDown" Margin="0,0,-220,0"/>
         <Label x:Name="ExitProgramLabel" Content="X" Margin="464,-9,-198,0" VerticalAlignment="Top" Height="41" FontFamily="Trebuchet MS" FontSize="30" FontWeight="Bold" Foreground="#FF1F1F21" MouseDown="ExitProgramLabel_MouseDown" MouseEnter="ExitProgramLabel_MouseEnter" MouseLeave="ExitProgramLabel_MouseLeave" Grid.Column="2"/>
         <Label x:Name="MinimizeProgramLabel" Content="_" Margin="429,-29,-162,0" VerticalAlignment="Top" Height="57" FontFamily="Trebuchet MS" FontSize="38" Foreground="#FF1F1F21" FontWeight="Bold" MouseDown="MinimizeProgramLabel_MouseDown" MouseEnter="MinimizeProgramLabel_MouseEnter" MouseLeave="MinimizeProgramLabel_MouseLeave" Grid.Column="2"/>
         <Menu x:Name="MenuBar" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="199" Background="#FF565664" FontFamily="Trebuchet MS" FontWeight="Bold" MouseDown="Menu_MouseDown">
@@ -161,10 +161,15 @@
                         <Image Source="/Resources/ColorWheel_16x.png" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem x:Name="EnableDarkTheme" Header="Enable Dark Theme" IsCheckable="False" StaysOpenOnClick="False" Click="EnableDarkTheme_Click">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/DarkTheme_16x.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <Label x:Name="EditingLabel" Grid.ColumnSpan="2" Content="Editing: " HorizontalAlignment="Left" Margin="203.333,0,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" Height="28" FontSize="14" FontStyle="Italic" MouseDown="EditingLabel_MouseDown" Width="329" Grid.Column="1"/>
-        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="428" Margin="9,37,-187,0" VerticalAlignment="Top" Width="780" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single">
+        <DataGrid x:Name="PasswordDB" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="428" Margin="9,37,-187,0" VerticalAlignment="Top" Width="780" AutoGenerateColumns="True" IsSynchronizedWithCurrentItem="True" BeginningEdit="PasswordDB_BeginningEdit" SelectionChanged="PasswordDB_SelectionChanged" Grid.Column="1" SelectionMode="Single" CanUserReorderColumns="False">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem x:Name="EditEntry" Header="Edit" Click="EditEntry_Click">

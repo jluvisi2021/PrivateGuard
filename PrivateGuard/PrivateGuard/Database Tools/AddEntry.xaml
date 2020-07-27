@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:PrivateGuard.Database_Tools"
         mc:Ignorable="d"
         Title="AddEntry" Height="360" Width="425" Icon="Key_16x.png" ResizeMode="CanMinimize">
-    <Grid Background="#FFCBCBCB">
+    <Grid x:Name="Background" Background="#FFCBCBCB">
         <Label x:Name="Title" Content="Add Entry" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14" FontWeight="Bold" FontStyle="Italic"/>
         <Label x:Name="UsernameLabel" Content="Username" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14"/>
-        <Separator HorizontalAlignment="Left" Height="14" Margin="10,36,0,0" VerticalAlignment="Top" Width="422"/>
+        <Separator x:Name="Seperator" HorizontalAlignment="Left" Height="14" Margin="10,36,0,0" VerticalAlignment="Top" Width="422"/>
         <Label x:Name="PasswordLabel" Content="Password" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14"/>
         <Label x:Name="NotesLabel" Content="Notes" HorizontalAlignment="Left" Margin="10,206,0,0" VerticalAlignment="Top" FontFamily="Trebuchet MS" FontSize="14"/>
         <TextBox x:Name="UsernameField" HorizontalAlignment="Left" Height="25" Margin="10,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="225" FontFamily="Trebuchet MS" FontSize="14">

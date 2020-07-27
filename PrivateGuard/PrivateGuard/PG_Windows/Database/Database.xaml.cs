@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -51,7 +52,27 @@ namespace PrivateGuard.PG_Windows
             SetAutoSaveValue();
             SetupInputBindings();
             _timer = new Timer(Tick, null, 5000, Timeout.Infinite);
+            SetupDarkTheme();
             SetupTheme();
+            App.CheckForDarkMode((Panel)Content);
+
+            PasswordDB.CanUserResizeRows = false;
+            PasswordDB.RowHeaderWidth = 0;
+            if (App.DarkThemeEnabled)
+            {
+                RECT.Fill = App.DarkModeBackground;
+            }
+        }
+
+        public void SetupDarkTheme()
+        {
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var rawSettingsData = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            App.DarkThemeEnabled = rawSettingsData[14].Contains("Enabled");
+            if (App.DarkThemeEnabled)
+            {
+                EnableDarkTheme.Header = "Disable Dark Theme";
+            }
         }
 
         public void SetupTheme()
@@ -75,6 +96,11 @@ namespace PrivateGuard.PG_Windows
                 App.DatabaseColor.G = dGreen;
                 App.DatabaseColor.B = dBlue;
 
+                if (App.DarkThemeEnabled)
+                {
+                    //App.CheckForDarkTheme((Panel)Content);
+                    return;
+                }
                 App.ChangeGlobalFontColor((Panel)Content);
                 ChangeDatabaseColor();
 
@@ -87,7 +113,6 @@ namespace PrivateGuard.PG_Windows
                 Close();
                 MessageBox.Show("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\nCRITICAL ERROR STARTING APPLICATION.\nWe have detected that you are running version 1.0.6 or greater.\nWe were unable to find the values for font colors in the local settings file.\nThis may be because you have just upgraded from an older version.\n If this is the case please regenerate your settings file by deleting \"settings.bin\" at " + MainWindow.SETTINGS_DIR + ".\nTo read more visit: https://github.com/jluvisi2021/PrivateGuard/wiki \nThe Application will not start until this issue is solved.\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", "Critical Error.", MessageBoxButton.OK, MessageBoxImage.Stop);
             }
-
         }
 
         /// <summary>
@@ -357,7 +382,9 @@ namespace PrivateGuard.PG_Windows
                 Header = "ID #",
                 Binding = new Binding("ID"),
                 Width = 72
+                
             };
+            
             PasswordDB.Columns.Add(textColumn);
 
             textColumn = new DataGridTextColumn
@@ -465,16 +492,24 @@ namespace PrivateGuard.PG_Windows
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MessageBox.Show("Exit PrivateGuard?\nWould you like to save your changes?\n(May take some time)", "Exit", MessageBoxButton.YesNo, MessageBoxImage.Question) !=
-                MessageBoxResult.Yes)
-            {
-                Close();
-                return;
-            }
-            
-            SaveItem_Click(null, null);
-            Close();
+            MessageBoxResult result =
+                MessageBox.Show("Exit PrivateGuard?\nWould you like to save your changes?\n(May take some time)",
+                    "Exit", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    SaveItem_Click(null, null);
+                    Close();
+                    return;
+                case MessageBoxResult.No:
+                    Close();
+                    return;
+                case MessageBoxResult.Cancel:
+                    return;
+                default:
+                    return;
+            }
         }
 
         private void ExitProgramLabel_MouseEnter(object sender, MouseEventArgs e) =>
@@ -495,16 +530,40 @@ namespace PrivateGuard.PG_Windows
                 ((Label)sender).Foreground = new SolidColorBrush(Color.FromRgb(31, 31, 33));
 
 
-        private void Menu_MouseDown(object sender, MouseButtonEventArgs e) =>
-            DragMove();
+        private void Menu_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                DragMove();
+            }
+            catch (InvalidOperationException)
+            { // Ignore wrong mouse click.
+            }
+        }
+
+
+        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                DragMove();
+            }
+            catch (InvalidOperationException)
+            { // Ignore wrong mouse click.
+            }
+        }
         
 
-        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e) =>
-            DragMove();
-        
-
-        private void EditingLabel_MouseDown(object sender, MouseButtonEventArgs e) =>
-            DragMove();
+        private void EditingLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                DragMove();
+            }
+            catch (InvalidOperationException)
+            { // Ignore wrong mouse click.
+            }
+        }
         
 
         private void AddEntryItem_Click(object sender, RoutedEventArgs e)
@@ -1195,10 +1254,70 @@ namespace PrivateGuard.PG_Windows
         }
         private void ChangeDatabaseColor()
         {
+            if (App.DarkThemeEnabled)
+            {
+                return;
+            }
+
+            if (App.DarkThemeEnabled)
+            {
+                PasswordDB.RowBackground = App.DarkModeSecondaryBackground;
+                return;
+            }
             PasswordDB.RowBackground = new SolidColorBrush(App.DatabaseColor);
         }
-            
-        
+
+        private void EnableDarkTheme_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = (MenuItem) e.OriginalSource;
+            if (App.DarkThemeEnabled == false)
+            {
+                App.DarkThemeEnabled = true;
+                menuItem.Header = "Disable Dark Theme";
+                var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                b[14] = "Dark Theme: Enabled";
+                var newText = string.Empty;
+                foreach (var s in b) newText += s + Environment.NewLine;
+                File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
+
+                SetupDarkTheme();
+                App.CheckForDarkMode((Panel)Content);
+            }
+            else
+            {
+                if (MessageBox.Show("Disabling Dark Mode requires a visual reload.\nSave your data and reload Now? (This is not a restart)", "Disable Dark Theme",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    App.DarkThemeEnabled = false;
+                    menuItem.Header = "Enable Dark Theme";
+                    var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                    var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                    b[14] = "Dark Theme: Disabled";
+                    var newText = string.Empty;
+                    foreach (var s in b) newText += s + Environment.NewLine;
+                    File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
+                }
+                else
+                {
+                    App.DarkThemeEnabled = false;
+                    menuItem.Header = "Enable Dark Theme";
+                    var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+                    var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                    b[14] = "Dark Theme: Disabled";
+                    var newText = string.Empty;
+                    foreach (var s in b) newText += s + Environment.NewLine;
+                    File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
+                    SaveItem_Click(null, null);
+                    var db = new Database(Filename, _privateKey);
+                    db.Show();
+                    Close();
+                    
+                }
+                
+
+            }
+        }
     }
 
     public class EntryObject : ICloneable

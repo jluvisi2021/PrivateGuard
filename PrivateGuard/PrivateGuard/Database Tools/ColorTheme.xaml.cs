@@ -36,7 +36,7 @@ namespace PrivateGuard.Database_Tools
             var dGreen = byte.Parse(rawSettingsData[12]);
             var dBlue = byte.Parse(rawSettingsData[13]);
 
-            RedValueFont.Text = string.Empty+fRed;
+            RedValueFont.Text = string.Empty + fRed;
             GreenValueFont.Text = string.Empty + fGreen;
             BlueValueFont.Text = string.Empty + fBlue;
 
@@ -45,8 +45,11 @@ namespace PrivateGuard.Database_Tools
             BlueValueDatabase.Text = string.Empty + dBlue;
             ChangeGlobalFont(App.Font);
             UpdateText();
+            if (!App.DarkThemeEnabled)
+            {
+                DarkThemeNotif.Visibility = Visibility.Hidden;
+            }
 
-            
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -88,7 +91,12 @@ namespace PrivateGuard.Database_Tools
 
             MessageBox.Show("Colors have been changed globally.\nYou may now close this window.", "Colors Changed",
                 MessageBoxButton.OK, MessageBoxImage.Information);
-            
+            if (App.DarkThemeEnabled)
+            {
+                MessageBox.Show(
+                    "Because dark theme is currently active, these colors will not appear until dark theme is turned off.",
+                    "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
             App.FontColor.R = fRed;
             App.FontColor.G = fGreen;
             App.FontColor.B = fBlue;
@@ -98,7 +106,7 @@ namespace PrivateGuard.Database_Tools
 
             var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
             var b = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            b[8] = string.Empty+fRed;
+            b[8] = string.Empty + fRed;
             b[9] = string.Empty + fGreen;
             b[10] = string.Empty + fBlue;
             b[11] = string.Empty + dRed;
@@ -135,7 +143,7 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                red++;
+                red += 15;
                 RedValueFont.Text = string.Empty + red;
                 UpdateText();
             }
@@ -152,7 +160,7 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                red--;
+                red -= 15;
                 RedValueFont.Text = string.Empty + red;
                 UpdateText();
             }
@@ -169,13 +177,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                green++;
+                green += 15;
                 GreenValueFont.Text = string.Empty + green;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void DecreaseGreenFontButton_Click(object sender, RoutedEventArgs e)
@@ -187,13 +195,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                green--;
+                green -= 15;
                 GreenValueFont.Text = string.Empty + green;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void IncreaseBlueFontButton_Click(object sender, RoutedEventArgs e)
@@ -205,13 +213,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                blue++;
+                blue += 15;
                 BlueValueFont.Text = string.Empty + blue;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void DecreaseBlueFontButton_Click(object sender, RoutedEventArgs e)
@@ -223,13 +231,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                blue--;
+                blue -= 15;
                 BlueValueFont.Text = string.Empty + blue;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void IncreaseRedDatabaseButton_Click(object sender, RoutedEventArgs e)
@@ -241,14 +249,14 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                red++;
+                red += 15;
                 RedValueDatabase.Text = string.Empty + red;
                 UpdateText();
             }
             catch (Exception)
             { }
 
-            
+
         }
 
         private void DecreaseRedDatabaseButton_Click(object sender, RoutedEventArgs e)
@@ -260,13 +268,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                red--;
+                red -= 15;
                 RedValueDatabase.Text = string.Empty + red;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void IncreaseGreenDatabaseButton_Click(object sender, RoutedEventArgs e)
@@ -278,13 +286,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                green++;
+                green += 15;
                 GreenValueDatabase.Text = string.Empty + green;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void DecreaseGreenDatabaseButton_Click(object sender, RoutedEventArgs e)
@@ -296,13 +304,14 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                green--;
+
+                green -= 15;
                 GreenValueDatabase.Text = string.Empty + green;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void IncreaseBlueDatabaseButton_Click(object sender, RoutedEventArgs e)
@@ -314,13 +323,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                blue++;
+                blue += 15;
                 BlueValueDatabase.Text = string.Empty + blue;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void DecreaseBlueDatabaseButton_Click(object sender, RoutedEventArgs e)
@@ -332,13 +341,13 @@ namespace PrivateGuard.Database_Tools
                 {
                     return;
                 }
-                blue--;
+                blue -= 15;
                 BlueValueDatabase.Text = string.Empty + blue;
                 UpdateText();
             }
             catch (Exception)
             { }
-            
+
         }
 
         private void RedValueFont_KeyDown(object sender, KeyEventArgs e)
@@ -490,7 +499,7 @@ namespace PrivateGuard.Database_Tools
             ExampleText4.Foreground = new SolidColorBrush(testDatabaseColor);
             ExampleText5.Foreground = new SolidColorBrush(testDatabaseColor);
             ExampleText6.Foreground = new SolidColorBrush(testDatabaseColor);
-           
+
         }
         public static bool IsKeyADigit(Key key)
         {
