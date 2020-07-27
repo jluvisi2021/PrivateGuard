@@ -288,7 +288,7 @@
     <Resource Include="Resources\DarkTheme_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <FileAssociation Include=".pdb">
+    <FileAssociation Include=".pgm">
       <Visible>False</Visible>
       <Description>Manager File</Description>
       <Progid>1</Progid>

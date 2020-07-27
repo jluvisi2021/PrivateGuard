@@ -29,7 +29,7 @@ namespace PrivateGuard
     public partial class MainWindow : Window
     {
         private bool _showFileKeyField;
-        public static string VersionID = "1.1.0 Beta";
+        public static string VersionID = "1.1.0";
 
         public static readonly string SETTINGS_DIR =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
