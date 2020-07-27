@@ -9,6 +9,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Description = A C# based offline password manager for windows.
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DA435DD6-4B18-4EA5-B015-2844950A17A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

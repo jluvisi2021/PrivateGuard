@@ -30,7 +30,7 @@
     <PublisherName>Jacob LuVisi</PublisherName>
     <SuiteName>Jacob LuVisi</SuiteName>
     <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.1.0.1</ApplicationVersion>
+    <ApplicationVersion>1.2.1.1</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -76,6 +76,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>PG_Shield_t_70.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />

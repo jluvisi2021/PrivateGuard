@@ -29,7 +29,7 @@ namespace PrivateGuard
     public partial class MainWindow : Window
     {
         private bool _showFileKeyField;
-        public static string VersionID = "1.1.0";
+        public static string VersionID = "1.2.1";
 
         public static readonly string SETTINGS_DIR =
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\PrivateGuard\\settings.bin";
@@ -49,10 +49,10 @@ namespace PrivateGuard
                     $"Private Guard Settings File: (V.{VersionID})",
                     $"Created On: {DateTime.Now}",
                     "",
-                    "IDLE_TIMER: Enabled",
+                    "IDLE_TIMER: Disabled",
                     "GLOBAL_FONT: Trebuchet MS",
                     "FONT_SIZE: 12px",
-                    "AUTO_SAVE: Disabled",
+                    "AUTO_SAVE: Enabled",
                     "Custom Color Data: (RGB)",
                     "0",
                     "0",
@@ -134,6 +134,9 @@ namespace PrivateGuard
         {
             var a = string.Empty;
 
+            var checkable = _showFileKeyField ? ViewPasswordTextBox.Text : FileKeyField.Password;
+
+
             if (string.IsNullOrWhiteSpace(FileKeyField.Password))
             {
                 DisplayErrorMessage(ErrorTypes.NO_FILE_KEY);
@@ -146,14 +149,22 @@ namespace PrivateGuard
                 return;
             }
 
-            var checkable = _showFileKeyField ? ViewPasswordTextBox.Text : FileKeyField.Password;
-
-
             a = SelectedFileField.Text;
             try
             {
-                var fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
-                var bw2 = new BinaryReader(fs2);
+                FileStream fs2 = null;
+                BinaryReader bw2 = null;
+                try
+                {
+                    fs2 = new FileStream(SelectedFileField.Text, FileMode.Open);
+                    bw2 = new BinaryReader(fs2);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    DisplayErrorMessage(ErrorTypes.FILE_NOT_FOUND);
+                    return;
+                }
+                
                 string modifierValue;
                 try
                 {

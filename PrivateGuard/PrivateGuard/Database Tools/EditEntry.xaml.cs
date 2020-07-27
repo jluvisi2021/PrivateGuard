@@ -80,7 +80,7 @@ namespace PrivateGuard.Database_Tools
             {
                 if (char.IsNumber(PasswordField.Text.ToCharArray()[i]))
                 {
-                    strength += 4;
+                    strength += 3;
                 }
                 else if (char.IsPunctuation(PasswordField.Text.ToCharArray()[i]))
                 {
@@ -101,7 +101,21 @@ namespace PrivateGuard.Database_Tools
                     strength -= ((count / 2) - PasswordField.Text.Length / 14);
                 }
             }
+            int length = PasswordField.Text.Length;
+            int numLength = 0;
+            foreach (char c in PasswordField.Text.ToCharArray())
+            {
+                if (char.IsNumber(c))
+                {
+                    numLength++;
+                }
+            }
 
+            if (numLength >= length / 2)
+            {
+                strength /= 2;
+            }
+            PasswordStrengthBar.Value = strength;
             PasswordStrengthBar.Value = strength;
 
         }
@@ -113,7 +127,7 @@ namespace PrivateGuard.Database_Tools
             {
                 if (char.IsNumber(PasswordField.Text.ToCharArray()[i]))
                 {
-                    strength += 4;
+                    strength += 3;
                 }
                 else if (char.IsPunctuation(PasswordField.Text.ToCharArray()[i]))
                 {
@@ -134,6 +148,21 @@ namespace PrivateGuard.Database_Tools
                     strength -= ((count / 2) - PasswordField.Text.Length / 14);
                 }
             }
+            int length = PasswordField.Text.Length;
+            int numLength = 0;
+            foreach (char c in PasswordField.Text.ToCharArray())
+            {
+                if (char.IsNumber(c))
+                {
+                    numLength++;
+                }
+            }
+
+            if (numLength >= length / 2)
+            {
+                strength /= 2;
+            }
+            PasswordStrengthBar.Value = strength;
             PasswordStrengthBar.Value = strength;
 
         }
