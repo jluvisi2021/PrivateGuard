@@ -40,11 +40,15 @@ namespace PrivateGuard.PG_Windows
 
         public Database(string filename, string privateKey)
         {
+
+
+
             InitializeComponent();
             Filename = filename;
             _privateKey = privateKey;
             EditingLabel.Content = "Editing: " + Filename.Trim().Split('\\')[Filename.Trim().Split('\\').Length - 1];
-
+            
+            CheckUpToDateSettingsFile();
             SetupDataGrid();
             GetSettingsFont(File.ReadAllText(MainWindow.SETTINGS_DIR));
             GetSettingsFontSize();
@@ -64,6 +68,16 @@ namespace PrivateGuard.PG_Windows
             }
         }
 
+        public void CheckUpToDateSettingsFile()
+        {
+            var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
+            var rawSettingsData = data.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            if (!rawSettingsData[14].Contains("Dark"))
+            {
+                MessageBox.Show(
+                    "Your settings.bin file is outdated.\nPlease regenerate it!\nHow to regenerate: https://github.com/jluvisi2021/PrivateGuard/wiki", "Settings File", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
         public void SetupDarkTheme()
         {
             var data = File.ReadAllText(MainWindow.SETTINGS_DIR);
@@ -74,7 +88,9 @@ namespace PrivateGuard.PG_Windows
                 EnableDarkTheme.Header = "Disable Dark Theme";
             }
         }
-
+        /// <summary>
+        /// Loads the theme data from the settings file.
+        /// </summary>
         public void SetupTheme()
         {
             try

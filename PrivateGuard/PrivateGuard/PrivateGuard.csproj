@@ -25,11 +25,12 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
+    <TargetCulture>en-US</TargetCulture>
     <ProductName>Private Guard</ProductName>
     <PublisherName>Jacob LuVisi</PublisherName>
     <SuiteName>Jacob LuVisi</SuiteName>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.7.0</ApplicationVersion>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.1.0.1</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -187,6 +188,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="pdb_ext.content" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -284,6 +286,25 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\DarkTheme_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <FileAssociation Include=".pdb">
+      <Visible>False</Visible>
+      <Description>Manager File</Description>
+      <Progid>1</Progid>
+      <DefaultIcon>Properties\pdb_file.ico</DefaultIcon>
+    </FileAssociation>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="pdb_ext.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="content.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties\pdb_file.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
