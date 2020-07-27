@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using Microsoft.Win32;
 using PrivateGuard.Database_Tools;
@@ -59,13 +60,10 @@ namespace PrivateGuard.PG_Windows
             SetupDarkTheme();
             SetupTheme();
             App.CheckForDarkMode((Panel)Content);
-
+            
             PasswordDB.CanUserResizeRows = false;
             PasswordDB.RowHeaderWidth = 0;
-            if (App.DarkThemeEnabled)
-            {
-                RECT.Fill = App.DarkModeBackground;
-            }
+           
         }
 
         public void CheckUpToDateSettingsFile()
@@ -86,6 +84,10 @@ namespace PrivateGuard.PG_Windows
             if (App.DarkThemeEnabled)
             {
                 EnableDarkTheme.Header = "Disable Dark Theme";
+                if (App.DarkThemeEnabled)
+                {
+                    RECT.Fill = App.DarkModeBackground;
+                }
             }
         }
         /// <summary>
@@ -351,16 +353,15 @@ namespace PrivateGuard.PG_Windows
             {
                 if (_isAutoSaveEnabled)
                 {
-                    // Save around every 4 minutes
+                    // Save around every 1 minute
                     ++_count;
 
-                    if (_count / 50 == 0)
+                    if (_count % 2 == 0 && _count != 0)
                     {
-
                         SaveItem_Click(null, null);
+                        _count = 0;
                     }
 
-                    _count = 0;
                 }
                 if (!_isIdleTimerEnabled) return;
 
@@ -472,7 +473,7 @@ namespace PrivateGuard.PG_Windows
         /// </summary>
         /// <param name="cipherRawDataText"></param>
         /// <param name="key"></param>
-        private void FetchPlainTextDataParallel(List<string> cipherRawDataText, String key)
+        private void FetchPlainTextDataParallel(List<string> cipherRawDataText, string key)
         {
             cipherRawDataText.RemoveAt(0);//Remove modifier value.
             Parallel.For(0, cipherRawDataText.Count, (i, state) =>
@@ -481,17 +482,17 @@ namespace PrivateGuard.PG_Windows
                 {
                     try
                     {
-                        string ID = Cipher.Decrypt(cipherRawDataText[i].Substring(1, cipherRawDataText[i].Length - 1),
+                        var ID = Cipher.Decrypt(cipherRawDataText[i].Substring(1, cipherRawDataText[i].Length - 1),
                             _privateKey).Trim();
-                        string username =
+                        var username =
                             Cipher.Decrypt(cipherRawDataText[i + 1].Substring(1, cipherRawDataText[i + 1].Length - 1),
                                 _privateKey);
-                        string password =
+                        var password =
                             Cipher.Decrypt(cipherRawDataText[i + 2].Substring(1, cipherRawDataText[i + 2].Length - 1),
                                 _privateKey);
-                        string date = Cipher.Decrypt(cipherRawDataText[i + 3].Substring(1, cipherRawDataText[i + 3].Length - 1),
+                        var date = Cipher.Decrypt(cipherRawDataText[i + 3].Substring(1, cipherRawDataText[i + 3].Length - 1),
                             _privateKey);
-                        string notes =
+                        var notes =
                             Cipher.Decrypt(cipherRawDataText[i + 4].Substring(1, cipherRawDataText[i + 4].Length - 1),
                                 _privateKey);
                         PasswordDB.Items.Add(new EntryObject(int.Parse(ID), username, password, date, notes));
@@ -508,7 +509,7 @@ namespace PrivateGuard.PG_Windows
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            MessageBoxResult result =
+            var result =
                 MessageBox.Show("Exit PrivateGuard?\nWould you like to save your changes?\n(May take some time)",
                     "Exit", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
@@ -651,6 +652,7 @@ namespace PrivateGuard.PG_Windows
             entry.ShowDialog();
             if (entry.Entry == null) return;
             // Replace the entry.
+            
             PasswordDB.Items.RemoveAt(entry.Entry.ID);
             PasswordDB.Items.Insert(entry.Entry.ID, entry.Entry);
             _selectedEntry = -1; // Reset the selected entry as the selection bar is cancelled.
@@ -1299,6 +1301,8 @@ namespace PrivateGuard.PG_Windows
 
                 SetupDarkTheme();
                 App.CheckForDarkMode((Panel)Content);
+                RECT.Fill = App.DarkModeBackground;
+                
             }
             else
             {
@@ -1325,14 +1329,34 @@ namespace PrivateGuard.PG_Windows
                     foreach (var s in b) newText += s + Environment.NewLine;
                     File.WriteAllText(MainWindow.SETTINGS_DIR, newText);
                     SaveItem_Click(null, null);
+                    _isAutoSaveEnabled = false;
+                    _isIdleTimerEnabled = false;
+                    
                     var db = new Database(Filename, _privateKey);
                     db.Show();
                     Close();
-                    
                 }
                 
 
             }
+        }
+
+        private void DuplicateEntry_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedEntry == -1)
+            {
+                MessageBox.Show("Select a row to copy first.", "Error copying entry.", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
+
+            if (!(PasswordDB.Items[_selectedEntry] is EntryObject obj))
+            {
+                return;
+            }
+            var copy = (EntryObject)obj.Clone();
+            copy.ID = PasswordDB.Items.Count;
+            PasswordDB.Items.Add(copy);
         }
     }
 

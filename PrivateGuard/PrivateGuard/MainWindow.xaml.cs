@@ -38,7 +38,6 @@ namespace PrivateGuard
         public MainWindow()
         {
             InitializeComponent();
-            SetupPrimaryScreen();
 
             var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             // Access settings.bin file.
@@ -65,19 +64,7 @@ namespace PrivateGuard
                 };
                 File.WriteAllLines(appdata + "\\PrivateGuard\\settings.bin", testing);
             }
-        }
-
-        /// <summary>
-        ///     Organizes the primary screen through code rather than XAML.
-        /// </summary>
-        private void SetupPrimaryScreen()
-        {
-            var mw = this;
-            mw.VersionLabel.Content = "Version: " + VersionID;
-            
-            OpenFileButton.BorderThickness = new Thickness(2.5);
-            NewFileButton.BorderThickness = new Thickness(2.5);
-            DocumentationButton.BorderThickness = new Thickness(2.5);
+            VersionLabel.Content = "Version: " + VersionID;
         }
 
         private void ExitProgramLabel_MouseDown(object sender, MouseButtonEventArgs e)

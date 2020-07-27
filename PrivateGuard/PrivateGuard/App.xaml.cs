@@ -97,7 +97,7 @@ namespace PrivateGuard
                         // Sets all of the menu items to the set color.
                         menu.Foreground = DarkModeText;
                         menu.Background = DarkModeSecondaryBackground;
-                        menu.BorderBrush = DarkModeHighlightText;
+                        menu.BorderBrush = DarkModeSecondaryBackground;
                         foreach (MenuItem item in menu.Items)
                         {
                             foreach (MenuItem subItem in item.Items)
@@ -107,15 +107,19 @@ namespace PrivateGuard
                                     extendedSubMenuItem.Background = DarkModeSecondaryBackground;
                                     extendedSubMenuItem.Foreground = DarkModeText;
                                     extendedSubMenuItem.BorderBrush = DarkModeSecondaryBackground;
+                                   
                                 }
                                 subItem.Background = DarkModeSecondaryBackground;
                                 subItem.Foreground = DarkModeText;
                                 subItem.BorderBrush = DarkModeSecondaryBackground;
+                               
+
                             }
                             item.Background = DarkModeSecondaryBackground;
                             item.Foreground = DarkModeText;
                             item.BorderBrush = DarkModeSecondaryBackground;
-                            
+                            item.Style = (Style)Current.FindResource("MenuItemBaseStyle");
+
                         }
                     }else if (control.GetType() == typeof(TextBlock))
                     {

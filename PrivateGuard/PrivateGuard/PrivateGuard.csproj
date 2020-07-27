@@ -188,7 +188,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="pdb_ext.content" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -234,9 +233,6 @@
     <Resource Include="Resources\Add_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\ASX_Edit_blue_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\DeleteAllRows_16x.png" />
   </ItemGroup>
   <ItemGroup>
@@ -244,9 +240,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Timer_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\ASX_Copy_blue_16x.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Font_16x.png" />
@@ -296,15 +289,14 @@
     </FileAssociation>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="pdb_ext.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="content.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\pdb_file.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\ASX_Edit_blue_16x.png" />
+    <Resource Include="Resources\ASX_Copy_blue_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
