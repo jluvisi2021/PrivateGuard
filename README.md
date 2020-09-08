@@ -1,10 +1,7 @@
 # PrivateGuard
  A C# based offline password manager for Windows.
  
- Downloads: (v1.0.1-BETA, Outdated, For up to date builds please download from the Github release area)
- 1. http://www.mediafire.com/file/9ts2bm5mc1r6wz8/Private_Guard_%2528v1.0.1-BETA%2529.zip/file
- 2. https://mega.nz/file/SQoXnAyC#2cJc01OiNHJzVAx18iLdICp8fIE1aDUu6Izz9ipbR-k
- 3. https://drive.google.com/file/d/13jeSCTbu7UT-d_Gxda-ghNl_xUVbh_H_/view?usp=sharing
+ Download official build from "Releases" on right.
  
 # About
 Private Guard is a one-man project I started July 11th, 2020.
@@ -16,4 +13,4 @@ In the Private Guard application there is a button called "How to Use" which wil
 # How to Use (2)
 If you are still stuck you can refer to the Github Wiki page which also explains how to use this application as well as some common errors and Q&A.
 # As of today
-Private Guard is still in active development by me and I will continue to update Private Guard for a while until I am mostly satisfied with my work. This project has taught me a lot about designing desktop applications!
+As of today, Private Guard is currently in its final release form. There will likely be no other updates unless a major bug or security flaw is discovered. This project has taught me a lot about designing desktop applications!
